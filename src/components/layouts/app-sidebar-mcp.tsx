@@ -104,20 +104,25 @@ export function AppSidebarMcp() {
         const isGroupOpen = groupOpen[groupKey] ?? true;
         const label = groupKey === UNGROUPED ? t("MCP.ungrouped") : groupKey;
         return (
-          <SidebarMenu key={groupKey}>
+          <SidebarMenu key={groupKey} className="mt-1">
             <SidebarMenuItem>
-              <SidebarMenuButton
+              {/* Category label, not a nav item: small + muted, and (unlike the
+                  clickable rows) it does NOT fill the whole row on hover. It only
+                  collapses/expands its group — mirrors Claude's section headers. */}
+              <button
+                type="button"
+                aria-expanded={isGroupOpen}
                 onClick={() =>
                   setGroupOpen((prev) => ({
                     ...prev,
                     [groupKey]: !isGroupOpen,
                   }))
                 }
-                className="text-xs font-medium text-muted-foreground hover:text-foreground"
+                className="flex w-full items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground/80 transition-colors hover:text-foreground"
               >
                 <ChevronRight
                   className={cn(
-                    "size-3.5 transition-transform",
+                    "size-3 shrink-0 transition-transform",
                     isGroupOpen && "rotate-90",
                   )}
                 />
@@ -125,7 +130,7 @@ export function AppSidebarMcp() {
                 <span className="ml-auto text-[10px] tabular-nums opacity-60">
                   {servers.length}
                 </span>
-              </SidebarMenuButton>
+              </button>
             </SidebarMenuItem>
 
             {isGroupOpen && (
