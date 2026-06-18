@@ -137,6 +137,24 @@ export async function refreshMcpClientAction(id: string) {
   await mcpClientsManager.refreshClient(id);
 }
 
+export async function updateMcpCategoryAction(
+  id: string,
+  category: string | null,
+) {
+  const mcpServer = await mcpRepository.selectById(id);
+  if (!mcpServer) {
+    throw new Error("MCP server not found");
+  }
+  const canManage = await canManageMCPServer(
+    mcpServer.userId,
+    mcpServer.visibility,
+  );
+  if (!canManage) {
+    throw new Error("You don't have permission to edit this MCP connection");
+  }
+  await mcpRepository.updateCategory(id, category);
+}
+
 export async function authorizeMcpClientAction(id: string) {
   await refreshMcpClientAction(id);
   const client = await mcpClientsManager.getClient(id);

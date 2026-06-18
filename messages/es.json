@@ -252,7 +252,8 @@
     "reportAnIssue": "Reportar un problema",
     "joinCommunity": "Unirse a la Comunidad",
     "workflow": "Flujo de Trabajo",
-    "userSettings": "Configuración de Usuario"
+    "userSettings": "Configuración de Usuario",
+    "mcpServers": "Servidores MCP"
   },
   "Archive": {
     "title": "Archivo",
@@ -377,7 +378,10 @@
     "clearInput": "Limpiar",
     "exampleIsTemplate": "Generado a partir de los tipos del esquema; edita los valores antes de llamar.",
     "callSucceeded": "Correcto",
-    "callFailed": "Error"
+    "callFailed": "Error",
+    "ungrouped": "Sin grupo",
+    "group": "Grupo",
+    "groupPlaceholder": "Escribe o elige un grupo"
   },
   "Error": {},
   "Info": {

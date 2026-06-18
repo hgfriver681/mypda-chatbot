@@ -44,6 +44,7 @@ export type MCPServerInfo = {
   name: string;
   config?: MCPServerConfig; // Optional - hidden from non-owners for security
   visibility: "public" | "private";
+  category?: string | null;
   error?: unknown;
   enabled: boolean;
   userId: string;
@@ -69,6 +70,7 @@ export type McpServerInsert = {
   id?: string;
   userId: string;
   visibility?: "public" | "private";
+  category?: string | null;
 };
 export type MCPConnectionStatus = "connected" | "error";
 
@@ -78,6 +80,7 @@ export type McpServerSelect = {
   id: string;
   userId: string;
   visibility: "public" | "private";
+  category?: string | null;
   toolInfo?: MCPToolInfo[] | null;
   toolInfoUpdatedAt?: Date | null;
   lastConnectionStatus?: MCPConnectionStatus | null;
@@ -100,6 +103,7 @@ export interface MCPRepository {
   deleteById(id: string): Promise<void>;
   existsByServerName(name: string): Promise<boolean>;
   updateVisibility(id: string, visibility: "public" | "private"): Promise<void>;
+  updateCategory(id: string, category: string | null): Promise<void>;
   updateToolInfo(id: string, toolInfo: MCPToolInfo[]): Promise<void>;
   updateConnectionStatus(
     id: string,

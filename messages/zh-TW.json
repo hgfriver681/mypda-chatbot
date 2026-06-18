@@ -253,7 +253,8 @@
     "reportAnIssue": "報告問題",
     "joinCommunity": "加入社群",
     "workflow": "工作流",
-    "userSettings": "使用者設定"
+    "userSettings": "使用者設定",
+    "mcpServers": "MCP 伺服器"
   },
   "Archive": {
     "title": "歸檔",
@@ -379,7 +380,10 @@
     "clearInput": "清空",
     "exampleIsTemplate": "此為依型別自動產生的模板，呼叫前請依需要修改數值。",
     "callSucceeded": "成功",
-    "callFailed": "失敗"
+    "callFailed": "失敗",
+    "ungrouped": "未分組",
+    "group": "群組",
+    "groupPlaceholder": "輸入或選擇群組名稱"
   },
   "Error": {},
   "Info": {

@@ -253,7 +253,8 @@
     "reportAnIssue": "报告问题",
     "joinCommunity": "加入社区",
     "workflow": "工作流",
-    "userSettings": "用户设置"
+    "userSettings": "用户设置",
+    "mcpServers": "MCP 服务器"
   },
   "Archive": {
     "title": "归档",
@@ -379,7 +380,10 @@
     "clearInput": "清空",
     "exampleIsTemplate": "此为依据类型自动生成的模板，调用前请按需修改数值。",
     "callSucceeded": "成功",
-    "callFailed": "失败"
+    "callFailed": "失败",
+    "ungrouped": "未分组",
+    "group": "分组",
+    "groupPlaceholder": "输入或选择分组名称"
   },
   "Error": {},
   "Info": {

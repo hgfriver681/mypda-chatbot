@@ -395,7 +395,8 @@
     "showLessChats": "Vis færre",
     "reportAnIssue": "Rapporter et problem",
     "joinCommunity": "Bli med i fellesskapet",
-    "userSettings": "Brukerinnstillinger"
+    "userSettings": "Brukerinnstillinger",
+    "mcpServers": "MCP-servere"
   },
   "Archive": {
     "title": "Arkiv",
@@ -816,6 +817,9 @@
     "clearInput": "Tøm",
     "exampleIsTemplate": "Generert fra skjematypene — rediger verdiene før du kaller.",
     "callSucceeded": "Vellykket",
-    "callFailed": "Mislyktes"
+    "callFailed": "Mislyktes",
+    "ungrouped": "Ugruppert",
+    "group": "Gruppe",
+    "groupPlaceholder": "Skriv eller velg gruppe"
   }
 }

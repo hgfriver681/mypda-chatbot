@@ -94,6 +94,9 @@ export const McpServerTable = pgTable("mcp_server", {
   })
     .notNull()
     .default("private"),
+  // User-defined single-level group/folder for sidebar organization
+  // (free-form, nullable = ungrouped). See app-sidebar-mcp.tsx.
+  category: text("category"),
   toolInfo: json("tool_info").$type<MCPToolInfo[]>(),
   toolInfoUpdatedAt: timestamp("tool_info_updated_at"),
   lastConnectionStatus: varchar("last_connection_status", {

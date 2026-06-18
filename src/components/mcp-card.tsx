@@ -1,43 +1,152 @@
 "use client";
 import {
+  Check,
   ChevronRight,
   FlaskConical,
-  ShieldAlertIcon,
+  FolderIcon,
   Loader,
   RotateCw,
   Settings,
   Settings2,
+  ShieldAlertIcon,
   Wrench,
 } from "lucide-react";
+import Link from "next/link";
+import { memo, useCallback, useMemo, useState } from "react";
+import { useSWRConfig } from "swr";
+import { safe } from "ts-safe";
 import { Alert, AlertDescription, AlertTitle } from "ui/alert";
 import { Button } from "ui/button";
 import { Card, CardContent, CardHeader } from "ui/card";
+import { Input } from "ui/input";
 import JsonView from "ui/json-view";
+import { Popover, PopoverContent, PopoverTrigger } from "ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "ui/tooltip";
-import { memo, useCallback, useMemo, useState } from "react";
-import Link from "next/link";
-import { useSWRConfig } from "swr";
-import { safe } from "ts-safe";
 
-import { handleErrorWithToast } from "ui/shared-toast";
 import {
   refreshMcpClientAction,
   removeMcpClientAction,
   shareMcpServerAction,
+  updateMcpCategoryAction,
 } from "@/app/api/mcp/actions";
+import { handleErrorWithToast } from "ui/shared-toast";
 import { ShareableActions, type Visibility } from "./shareable-actions";
 
 import type { MCPServerInfo, MCPToolInfo } from "app-types/mcp";
 
-import { ToolDetailPopup } from "./tool-detail-popup";
-import { useTranslations } from "next-intl";
-import { Separator } from "ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "ui/avatar";
 import { appStore } from "@/app/store";
-import { isString } from "lib/utils";
-import { redriectMcpOauth } from "lib/ai/mcp/oauth-redirect";
 import { BasicUser } from "app-types/user";
+import { redriectMcpOauth } from "lib/ai/mcp/oauth-redirect";
 import { canChangeVisibilityMCP } from "lib/auth/client-permissions";
+import { isString } from "lib/utils";
+import { useTranslations } from "next-intl";
+import { Avatar, AvatarFallback, AvatarImage } from "ui/avatar";
+import { Separator } from "ui/separator";
+import { ToolDetailPopup } from "./tool-detail-popup";
+
+// Inline group/category editor shown on each owned MCP card. Free-form, single
+// level; existing groups are offered as datalist suggestions. Persists via
+// updateMcpCategoryAction (independent of config save) and refreshes the list so
+// the grouped sidebar updates.
+const CategoryEditor = memo(function CategoryEditor({
+  id,
+  category,
+}: {
+  id: string;
+  category?: string | null;
+}) {
+  const t = useTranslations("MCP");
+  const { mutate } = useSWRConfig();
+  const mcpList = appStore((state) => state.mcpList);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(category ?? "");
+  const [saving, setSaving] = useState(false);
+
+  const suggestions = useMemo(() => {
+    const set = new Set<string>();
+    (mcpList ?? []).forEach((m) => {
+      if (m.category?.trim()) set.add(m.category.trim());
+    });
+    return [...set].sort();
+  }, [mcpList]);
+
+  const save = useCallback(
+    (next: string) =>
+      safe(() => setSaving(true))
+        .map(() => updateMcpCategoryAction(id, next.trim() || null))
+        .ifOk(() => {
+          mutate("/api/mcp/list");
+          setOpen(false);
+        })
+        .ifFail(handleErrorWithToast)
+        .watch(() => setSaving(false)),
+    [id, mutate],
+  );
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (o) setValue(category ?? "");
+      }}
+    >
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1 px-2 text-xs text-muted-foreground"
+          data-testid="mcp-category-button"
+        >
+          <FolderIcon className="size-3" />
+          {category?.trim() ? category : t("ungrouped")}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-64 space-y-2">
+        <p className="text-xs font-medium">{t("group")}</p>
+        <div className="flex items-center gap-1">
+          <Input
+            list={`mcp-cats-${id}`}
+            value={value}
+            autoFocus
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") save(value);
+            }}
+            placeholder={t("groupPlaceholder")}
+            className="h-8 text-sm"
+          />
+          <datalist id={`mcp-cats-${id}`}>
+            {suggestions.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
+          <Button
+            size="icon"
+            className="size-8 shrink-0"
+            disabled={saving}
+            onClick={() => save(value)}
+          >
+            {saving ? (
+              <Loader className="size-3 animate-spin" />
+            ) : (
+              <Check className="size-3" />
+            )}
+          </Button>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 w-full justify-start text-xs text-muted-foreground"
+          disabled={saving}
+          onClick={() => save("")}
+        >
+          {t("ungrouped")}
+        </Button>
+      </PopoverContent>
+    </Popover>
+  );
+});
 
 // Main MCPCard component
 export const MCPCard = memo(function MCPCard({
@@ -50,6 +159,7 @@ export const MCPCard = memo(function MCPCard({
   visibility,
   enabled,
   userId,
+  category,
   user,
   userName,
   userAvatar,
@@ -141,6 +251,8 @@ export const MCPCard = memo(function MCPCard({
         <h4 className="font-bold text-xs sm:text-lg flex items-center gap-1">
           {name}
         </h4>
+
+        {isOwner && <CategoryEditor id={id} category={category} />}
 
         <div className="flex-1" />
 

@@ -53,6 +53,7 @@ export const pgMcpRepository: MCPRepository = {
         enabled: McpServerTable.enabled,
         userId: McpServerTable.userId,
         visibility: McpServerTable.visibility,
+        category: McpServerTable.category,
         lastConnectionStatus: McpServerTable.lastConnectionStatus,
         createdAt: McpServerTable.createdAt,
         updatedAt: McpServerTable.updatedAt,
@@ -75,6 +76,15 @@ export const pgMcpRepository: MCPRepository = {
     await db
       .update(McpServerTable)
       .set({ visibility, updatedAt: new Date() })
+      .where(eq(McpServerTable.id, id));
+  },
+
+  async updateCategory(id, category) {
+    // Normalize empty/whitespace to null (ungrouped).
+    const value = category?.trim() ? category.trim() : null;
+    await db
+      .update(McpServerTable)
+      .set({ category: value, updatedAt: new Date() })
       .where(eq(McpServerTable.id, id));
   },
 

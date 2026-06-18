@@ -7,33 +7,31 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "ui/sidebar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "ui/tooltip";
 import { SidebarMenu, SidebarMenuItem } from "ui/sidebar";
 import { SidebarGroupContent } from "ui/sidebar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "ui/tooltip";
 
-import { SidebarGroup } from "ui/sidebar";
-import Link from "next/link";
-import { getShortcutKeyList, Shortcuts } from "lib/keyboard-shortcuts";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { MCPIcon } from "ui/mcp-icon";
-import { WriteIcon } from "ui/write-icon";
+import { useArchives } from "@/hooks/queries/use-archives";
+import { BasicUser } from "app-types/user";
+import { Shortcuts, getShortcutKeyList } from "lib/keyboard-shortcuts";
+import { UI_FLAGS } from "lib/ui-flags";
+import { getIsUserAdmin } from "lib/user/utils";
 import {
-  FolderIcon,
   FolderOpenIcon,
   FolderSearchIcon,
   PlusIcon,
   Waypoints,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+import { SidebarGroup } from "ui/sidebar";
 import { Skeleton } from "ui/skeleton";
-import { useArchives } from "@/hooks/queries/use-archives";
+import { WriteIcon } from "ui/write-icon";
 import { ArchiveDialog } from "../archive-dialog";
-import { getIsUserAdmin } from "lib/user/utils";
-import { BasicUser } from "app-types/user";
+import { AppSidebarMcp } from "./app-sidebar-mcp";
 import { AppSidebarAdmin } from "./app-sidebar-menu-admin";
-import { AppSidebarMemory } from "./app-sidebar-memory";
-import { UI_FLAGS } from "lib/ui-flags";
 
 export function AppSidebarMenus({ user }: { user?: BasicUser }) {
   const router = useRouter();
@@ -80,18 +78,10 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
             </SidebarMenuItem>
           </Tooltip>
         </SidebarMenu>
-        <SidebarMenu>
-          <Tooltip>
-            <SidebarMenuItem>
-              <Link href="/mcp">
-                <SidebarMenuButton className="font-semibold">
-                  <MCPIcon className="size-4 fill-accent-foreground" />
-                  {t("Layout.mcpConfiguration")}
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          </Tooltip>
-        </SidebarMenu>
+        {/* Plan B: MCP servers grouped by user-defined category, collapsible.
+            Files / Memories / Requests / API Keys are server panels, not
+            top-level items. See app-sidebar-mcp.tsx. */}
+        <AppSidebarMcp />
         {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.workflow) */}
         {UI_FLAGS.workflow && (
           <SidebarMenu>
@@ -107,19 +97,6 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
             </Tooltip>
           </SidebarMenu>
         )}
-        <SidebarMenu>
-          <Tooltip>
-            <SidebarMenuItem>
-              <Link href="/files">
-                <SidebarMenuButton className="font-semibold">
-                  <FolderIcon className="size-4" />
-                  Files
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          </Tooltip>
-        </SidebarMenu>
-        <AppSidebarMemory />
         {getIsUserAdmin(user) && <AppSidebarAdmin />}
         {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.archive) */}
         {UI_FLAGS.archive && (

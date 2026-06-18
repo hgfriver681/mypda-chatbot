@@ -46,8 +46,19 @@ process.env：
 
 - Memory（myPDA MCP 併入）、Files UI、聊天存進 Memory、search_memory 動畫等，
   詳見專案外部記憶筆記。
-- Memory sidebar：Requests / API Keys 收納成 Memories 的子項（`app-sidebar-memory.tsx`，
-  可折疊，進 /memory 區段自動展開），不再三個平行。
+- Sidebar 結構（Plan B：以 MCP server 為主軸 + 使用者可編輯分組 + 收合）：
+  - `src/components/layouts/app-sidebar-mcp.tsx`：頂層只有「新聊天 / MCP 伺服器 / Admin」；
+    其餘一律是 MCP server 的面板。server 依使用者自訂 `category` 分組（單層、自由命名，
+    `未分組` 排最後），**群組可收合、server 也可收合**。`SERVER_PANELS`（依 server name）
+    把 Files 掛在 `datapilot-pdf`、Memories/Requests/API Keys 掛在 `mypda-memory`；
+    沒有面板的 server 直接連到 `/mcp/test/<id>`。（舊的 `app-sidebar-memory.tsx` 已移除。）
+  - 分組資料：`mcp_server` 新增 `category text`（nullable，migration `0017_*`，已 push
+    Supabase）。型別見 `app-types/mcp`（MCPServerInfo/Select/Insert 的 `category`）。
+    **`save()` 不碰 category**；改用 `updateMcpCategoryAction` / `mcpRepository.updateCategory`
+    單獨更新（避免存 config 時誤清空）。
+  - 編輯入口：每張 MCP 卡片名稱旁的「群組」按鈕（`mcp-card.tsx` 的 `CategoryEditor`，
+    popover + datalist 建議現有群組，owner 限定）。i18n：`MCP.group/ungrouped/groupPlaceholder`、
+    `Layout.mcpServers`。
 - 列表分頁：`src/components/memory/list-pager.tsx`（`usePagination` hook + `ListPager`
   元件，client-side 切片，每頁 10/25/50/100 可選），用於 Memories 與 Requests；
   筆數 ≤10 時自動隱藏分頁列。

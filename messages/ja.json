@@ -252,7 +252,8 @@
     "reportAnIssue": "問題を報告",
     "joinCommunity": "コミュニティに参加",
     "workflow": "ワークフロー",
-    "userSettings": "ユーザー設定"
+    "userSettings": "ユーザー設定",
+    "mcpServers": "MCP サーバー"
   },
   "Archive": {
     "title": "アーカイブ",
@@ -377,7 +378,10 @@
     "clearInput": "クリア",
     "exampleIsTemplate": "スキーマの型から生成したテンプレートです。呼び出す前に値を編集してください。",
     "callSucceeded": "成功",
-    "callFailed": "失敗"
+    "callFailed": "失敗",
+    "ungrouped": "未分類",
+    "group": "グループ",
+    "groupPlaceholder": "グループ名を入力または選択"
   },
   "Error": {},
   "Info": {

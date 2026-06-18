@@ -395,7 +395,8 @@
     "showLessChats": "Show less",
     "reportAnIssue": "Report an issue",
     "joinCommunity": "Join Community",
-    "userSettings": "User Settings"
+    "userSettings": "User Settings",
+    "mcpServers": "MCP Servers"
   },
   "Archive": {
     "title": "Archive",
@@ -816,6 +817,9 @@
     "clearInput": "Clear",
     "exampleIsTemplate": "Generated from the schema types — edit the values as needed before calling.",
     "callSucceeded": "Success",
-    "callFailed": "Failed"
+    "callFailed": "Failed",
+    "ungrouped": "Ungrouped",
+    "group": "Group",
+    "groupPlaceholder": "Enter or pick a group name"
   }
 }
