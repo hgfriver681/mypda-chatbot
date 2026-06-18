@@ -810,6 +810,7 @@
     "publicDescription": "Offentlig for alle brukere",
     "featured": "Fremhevet",
     "featuredDescription": "Fremhevet for alle brukere",
-    "noInstructions": "Ingen"
+    "noInstructions": "Ingen",
+    "downloadTemplate": "Last ned mal"
   }
 }

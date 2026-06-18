@@ -373,7 +373,8 @@
     "mcpServerCustomizationDescription": "MCP 伺服器自定義指令將在 MCP 伺服器可用時新增到系統提示中。",
     "toolCustomizationInstructionsPlaceholder": "工具自定義指令不可用。",
     "mcpServerCustomizationPlaceholder": "例如：如果輸入值是電子郵件，始終以 example@example.com 格式輸入電子郵件。",
-    "noInstructions": "無"
+    "noInstructions": "無",
+    "downloadTemplate": "下載 MCP 範本"
   },
   "Error": {},
   "Info": {

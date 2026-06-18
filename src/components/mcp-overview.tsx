@@ -1,22 +1,35 @@
 "use client";
-import { ArrowUpRight } from "lucide-react";
-import Link from "next/link";
+import { ArrowUpRight, LayoutTemplate } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { MCPIcon } from "ui/mcp-icon";
 
-import { NotionIcon } from "ui/notion-icon";
-import { LinearIcon } from "ui/linear-icon";
-import { PlaywrightIcon } from "ui/playwright-icon";
-import { NeonIcon } from "ui/neon-icon";
-import { StripeIcon } from "ui/stripe-icon";
-import { CanvaIcon } from "ui/canva-icon";
-import { PaypalIcon } from "ui/paypal-icon";
-import { Button } from "ui/button";
-import { AtlassianIcon } from "ui/atlassian-icon";
 import { AsanaIcon } from "ui/asana-icon";
+import { AtlassianIcon } from "ui/atlassian-icon";
+import { Button } from "ui/button";
+import { CanvaIcon } from "ui/canva-icon";
 import { GithubIcon } from "ui/github-icon";
+import { LinearIcon } from "ui/linear-icon";
+import { NeonIcon } from "ui/neon-icon";
+import { NotionIcon } from "ui/notion-icon";
+import { PaypalIcon } from "ui/paypal-icon";
+import { PlaywrightIcon } from "ui/playwright-icon";
+import { StripeIcon } from "ui/stripe-icon";
 
 export const RECOMMENDED_MCPS = [
+  // myPDA 自帶範本：下載「下載 MCP 範本」那包、docker compose up 跑在內網後，
+  // 點這個即可一鍵帶入連線設定（預設 localhost:8787 + demo-key），存檔再做連線測試。
+  {
+    name: "mypda-template",
+    label: "myPDA 範本",
+    config: {
+      url: "http://localhost:8787/mcp",
+      headers: {
+        Authorization: "Bearer demo-key",
+      },
+    },
+    icon: LayoutTemplate,
+  },
   {
     name: "github",
     label: "GitHub",

@@ -58,5 +58,18 @@ process.env：
   `DEFAULT_LOCALE = "zh-TW"`（見 `src/lib/const.ts`）。`getLocaleAction` 改為
   cookie 優先、否則回 `DEFAULT_LOCALE`，**不再用瀏覽器 Accept-Language 自動偵測**，
   讓預設語系確定是繁中。
+- MCP 範本與下載（部署模型 demo）：平台只當 MCP **client**，不託管客戶程式碼；
+  客戶下載範本 →自己 host →回 UI 填 URL+Key →連線測試。
+  - 範本原始碼在 `mcp-templates/{typescript,python}/`（各自獨立專案，含 Dockerfile +
+    docker-compose + `.env.example` + README + CLAUDE.md，4 個 demo 工具
+    ping/echo/server_time/add，Streamable HTTP 走 `POST /mcp`、stateless、Bearer
+    `MCP_API_KEY` 預設 `demo-key`、port 8787）。兩包都已實機啟動驗證過。
+  - 打包下載檔在 `public/mcp-templates/mypda-mcp-{typescript,python}.zip`，由
+    `scripts/build-mcp-templates.sh` 從上述原始碼重生（改範本後要重跑）。
+  - `/mcp` 頁右上「下載 MCP 範本」下拉（`mcp-dashboard.tsx`，i18n key
+    `MCP.downloadTemplate`）連到那兩個 zip；推薦清單（`mcp-overview.tsx`
+    `RECOMMENDED_MCPS`）多了「myPDA 範本」一鍵帶入 `localhost:8787/mcp` + demo-key。
+  - 適用：UI 與 MCP 同側（都內網／都外網）即開箱即用；雲端 UI 打內網 MCP 不支援
+    （請客戶自己開 tunnel）。
 
 最後更新：2026-06-18
