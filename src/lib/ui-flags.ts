@@ -29,4 +29,6 @@ export const UI_FLAGS = {
   webSearch: false,
   // Tools dropdown「Code Execution」toggle
   codeExecution: false,
+  // Tools dropdown「HTTP Request」toggle
+  httpRequest: false,
 } as const;

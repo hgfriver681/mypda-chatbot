@@ -892,10 +892,11 @@ function AppDefaultToolKitSelector() {
   const defaultToolInfo = useMemo(() => {
     const raw = t.raw("Chat.Tool.defaultToolKit");
     return Object.values(AppDefaultToolkit)
-      // Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.webSearch / codeExecution)
+      // Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.webSearch / codeExecution / httpRequest)
       .filter((toolkit) => {
         if (toolkit === AppDefaultToolkit.WebSearch) return UI_FLAGS.webSearch;
         if (toolkit === AppDefaultToolkit.Code) return UI_FLAGS.codeExecution;
+        if (toolkit === AppDefaultToolkit.Http) return UI_FLAGS.httpRequest;
         return true;
       })
       .map((toolkit) => {

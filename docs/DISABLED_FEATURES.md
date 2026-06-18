@@ -31,6 +31,7 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 | 10 | Tools dropdown「預設 / Presets」submenu | `src/components/tool-select-dropdown.tsx` — `<ToolPresets/>` | `toolPresets` | hidden (2026-06-18) |
 | 11 | Tools dropdown「網頁搜尋 / Web search」toggle | `src/components/tool-select-dropdown.tsx` — `AppDefaultToolKitSelector` (WebSearch toolkit) | `webSearch` | hidden (2026-06-18) |
 | 12 | Tools dropdown「Code Execution」toggle | `src/components/tool-select-dropdown.tsx` — `AppDefaultToolKitSelector` (Code toolkit) | `codeExecution` | hidden (2026-06-18) |
+| 13 | Tools dropdown「HTTP Request」toggle | `src/components/tool-select-dropdown.tsx` — `AppDefaultToolKitSelector` (Http toolkit) | `httpRequest` | hidden (2026-06-18) |
 
 ## Details & restore notes
 
@@ -57,10 +58,11 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 
 ## Important
 
-- Items 9–12 hide entries in the chat **Tools dropdown** only. For the toggles
-  (web search / code execution) this removes the switch from the UI but does not
-  forcibly clear whatever is already in `allowedAppDefaultToolkit` — it is a
-  UI-visibility change, consistent with the rest of this list.
+- Items 9–13 hide entries in the chat **Tools dropdown** only. For the toggles
+  (web search / code execution / HTTP request) this removes the switch from the
+  UI but does not forcibly clear whatever is already in
+  `allowedAppDefaultToolkit` — it is a UI-visibility change, consistent with the
+  rest of this list.
 - These are **UI-only** hides. Backend routes and APIs are untouched, so the
   features still work if a URL is visited directly. Only the entry points are
   hidden.
