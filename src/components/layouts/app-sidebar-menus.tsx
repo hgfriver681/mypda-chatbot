@@ -33,6 +33,7 @@ import { getIsUserAdmin } from "lib/user/utils";
 import { BasicUser } from "app-types/user";
 import { AppSidebarAdmin } from "./app-sidebar-menu-admin";
 import { AppSidebarMemory } from "./app-sidebar-memory";
+import { UI_FLAGS } from "lib/ui-flags";
 
 export function AppSidebarMenus({ user }: { user?: BasicUser }) {
   const router = useRouter();
@@ -91,18 +92,21 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
             </SidebarMenuItem>
           </Tooltip>
         </SidebarMenu>
-        <SidebarMenu>
-          <Tooltip>
-            <SidebarMenuItem>
-              <Link href="/workflow">
-                <SidebarMenuButton className="font-semibold">
-                  <Waypoints className="size-4" />
-                  {t("Layout.workflow")}
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          </Tooltip>
-        </SidebarMenu>
+        {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.workflow) */}
+        {UI_FLAGS.workflow && (
+          <SidebarMenu>
+            <Tooltip>
+              <SidebarMenuItem>
+                <Link href="/workflow">
+                  <SidebarMenuButton className="font-semibold">
+                    <Waypoints className="size-4" />
+                    {t("Layout.workflow")}
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            </Tooltip>
+          </SidebarMenu>
+        )}
         <SidebarMenu>
           <Tooltip>
             <SidebarMenuItem>
@@ -117,74 +121,79 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
         </SidebarMenu>
         <AppSidebarMemory />
         {getIsUserAdmin(user) && <AppSidebarAdmin />}
-        <SidebarMenu className="group/archive">
-          <Tooltip>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                onClick={toggleArchive}
-                className="font-semibold"
-              >
-                {expandedArchive ? (
-                  <FolderOpenIcon className="size-4" />
-                ) : (
-                  <FolderSearchIcon className="size-4" />
-                )}
-                {t("Archive.title")}
-              </SidebarMenuButton>
-              <SidebarMenuAction
-                className="group-hover/archive:opacity-100 opacity-0 transition-opacity"
-                onClick={() => setAddArchiveDialogOpen(true)}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <PlusIcon className="size-4" />
-                  </TooltipTrigger>
-                  <TooltipContent side="right" align="center">
-                    {t("Archive.addArchive")}
-                  </TooltipContent>
-                </Tooltip>
-              </SidebarMenuAction>
-            </SidebarMenuItem>
-          </Tooltip>
-          {expandedArchive && (
-            <>
-              <SidebarMenuSub>
-                {isLoadingArchives ? (
-                  <div className="gap-2 flex flex-col">
-                    {Array.from({ length: 2 }).map((_, index) => (
-                      <Skeleton key={index} className="h-6 w-full" />
-                    ))}
-                  </div>
-                ) : archives!.length === 0 ? (
-                  <SidebarMenuSubItem>
-                    <SidebarMenuSubButton className="text-muted-foreground">
-                      {t("Archive.noArchives")}
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                ) : (
-                  archives!.map((archive) => (
-                    <SidebarMenuSubItem
-                      onClick={() => {
-                        router.push(`/archive/${archive.id}`);
-                      }}
-                      key={archive.id}
-                      className="cursor-pointer"
-                    >
-                      <SidebarMenuSubButton>
-                        {archive.name}
+        {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.archive) */}
+        {UI_FLAGS.archive && (
+          <SidebarMenu className="group/archive">
+            <Tooltip>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={toggleArchive}
+                  className="font-semibold"
+                >
+                  {expandedArchive ? (
+                    <FolderOpenIcon className="size-4" />
+                  ) : (
+                    <FolderSearchIcon className="size-4" />
+                  )}
+                  {t("Archive.title")}
+                </SidebarMenuButton>
+                <SidebarMenuAction
+                  className="group-hover/archive:opacity-100 opacity-0 transition-opacity"
+                  onClick={() => setAddArchiveDialogOpen(true)}
+                >
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <PlusIcon className="size-4" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" align="center">
+                      {t("Archive.addArchive")}
+                    </TooltipContent>
+                  </Tooltip>
+                </SidebarMenuAction>
+              </SidebarMenuItem>
+            </Tooltip>
+            {expandedArchive && (
+              <>
+                <SidebarMenuSub>
+                  {isLoadingArchives ? (
+                    <div className="gap-2 flex flex-col">
+                      {Array.from({ length: 2 }).map((_, index) => (
+                        <Skeleton key={index} className="h-6 w-full" />
+                      ))}
+                    </div>
+                  ) : archives!.length === 0 ? (
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton className="text-muted-foreground">
+                        {t("Archive.noArchives")}
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
-                  ))
-                )}
-              </SidebarMenuSub>
-            </>
-          )}
-        </SidebarMenu>
+                  ) : (
+                    archives!.map((archive) => (
+                      <SidebarMenuSubItem
+                        onClick={() => {
+                          router.push(`/archive/${archive.id}`);
+                        }}
+                        key={archive.id}
+                        className="cursor-pointer"
+                      >
+                        <SidebarMenuSubButton>
+                          {archive.name}
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))
+                  )}
+                </SidebarMenuSub>
+              </>
+            )}
+          </SidebarMenu>
+        )}
       </SidebarGroupContent>
-      <ArchiveDialog
-        open={addArchiveDialogOpen}
-        onOpenChange={setAddArchiveDialogOpen}
-      />
+      {UI_FLAGS.archive && (
+        <ArchiveDialog
+          open={addArchiveDialogOpen}
+          onOpenChange={setAddArchiveDialogOpen}
+        />
+      )}
     </SidebarGroup>
   );
 }

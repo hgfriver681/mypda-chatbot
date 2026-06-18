@@ -11,6 +11,7 @@ import { SidebarHeaderShared } from "./sidebar-header";
 import { isShortcutEvent, Shortcuts } from "lib/keyboard-shortcuts";
 import { AppSidebarUser } from "./app-sidebar-user";
 import { BasicUser } from "app-types/user";
+import { UI_FLAGS } from "lib/ui-flags";
 
 export function AppSidebar({
   user,
@@ -51,7 +52,8 @@ export function AppSidebar({
       <SidebarContent className="mt-2 overflow-hidden relative">
         <div className="flex flex-col overflow-y-auto">
           <AppSidebarMenus user={user} />
-          <AppSidebarAgents userRole={userRole} />
+          {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.agents) */}
+          {UI_FLAGS.agents && <AppSidebarAgents userRole={userRole} />}
           <AppSidebarThreads />
         </div>
       </SidebarContent>
