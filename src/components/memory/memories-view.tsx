@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { RefreshCw, Plus, Trash2, BrainIcon } from "lucide-react";
 import type { Memory, MemoryRange } from "app-types/memory";
 import { relativeTime, collectCategories } from "lib/memory/format";
+import { usePagination, ListPager } from "./list-pager";
 
 const RANGES: MemoryRange[] = ["all", "7d", "30d"];
 const RANGE_LABEL: Record<MemoryRange, string> = {
@@ -37,6 +38,16 @@ export function MemoriesView() {
     { revalidateOnFocus: false },
   );
   const memories = data?.memories ?? [];
+
+  const {
+    page,
+    setPage,
+    pageSize,
+    onPageSizeChange,
+    pageItems,
+    total,
+    totalPages,
+  } = usePagination(memories, 10, `${range}:${category}`);
 
   // Category chips are derived from the full (unfiltered) set.
   const { data: allData } = useSWR<{ memories: Memory[] }>(
@@ -156,7 +167,7 @@ export function MemoriesView() {
             No memories yet.
           </div>
         ) : (
-          memories.map((m) => (
+          pageItems.map((m) => (
             <div
               key={m.id}
               data-testid="memory-row"
@@ -192,6 +203,16 @@ export function MemoriesView() {
           ))
         )}
       </div>
+
+      <ListPager
+        className="mt-3"
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onPageSizeChange={onPageSizeChange}
+      />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

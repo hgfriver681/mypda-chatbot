@@ -46,6 +46,11 @@ process.env：
 
 - Memory（myPDA MCP 併入）、Files UI、聊天存進 Memory、search_memory 動畫等，
   詳見專案外部記憶筆記。
+- Memory sidebar：Requests / API Keys 收納成 Memories 的子項（`app-sidebar-memory.tsx`，
+  可折疊，進 /memory 區段自動展開），不再三個平行。
+- 列表分頁：`src/components/memory/list-pager.tsx`（`usePagination` hook + `ListPager`
+  元件，client-side 切片，每頁 10/25/50/100 可選），用於 Memories 與 Requests；
+  筆數 ≤10 時自動隱藏分頁列。
 - 品牌：左上角改為 `public/myPDA-logo.png` + 「myPDA」字樣（取代 "better-chatbot"），
   見 `src/components/layouts/app-sidebar.tsx` 的 `SidebarHeaderShared title`。
 - i18n：新增 `messages/zh-TW.json`（繁體中文，由 `messages/zh.json` 經 opencc

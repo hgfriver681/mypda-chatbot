@@ -13,6 +13,7 @@ import {
 } from "ui/table";
 import type { MemoryInvocation } from "app-types/memory";
 import { relativeTime } from "lib/memory/format";
+import { usePagination, ListPager } from "./list-pager";
 
 // Requests = live MCP invocation log. We poll every 5s rather than use Supabase
 // Realtime, because Better Auth (not Supabase Auth) is the identity, so the
@@ -24,6 +25,16 @@ export function RequestsView() {
     { refreshInterval: 5000, revalidateOnFocus: true },
   );
   const rows = data?.invocations ?? [];
+
+  const {
+    page,
+    setPage,
+    pageSize,
+    onPageSizeChange,
+    pageItems,
+    total,
+    totalPages,
+  } = usePagination(rows, 25);
 
   return (
     <div className="mx-auto w-full max-w-4xl p-6">
@@ -58,7 +69,7 @@ export function RequestsView() {
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((r) => (
+              pageItems.map((r) => (
                 <TableRow key={r.id} data-testid="request-row">
                   <TableCell className="text-xs text-muted-foreground">
                     {relativeTime(r.createdAt as unknown as string)}
@@ -75,6 +86,16 @@ export function RequestsView() {
           </TableBody>
         </Table>
       </div>
+
+      <ListPager
+        className="mt-3"
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }
