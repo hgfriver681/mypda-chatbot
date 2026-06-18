@@ -40,7 +40,17 @@ export function AppSidebar({
       className="border-r border-sidebar-border/80"
     >
       <SidebarHeaderShared
-        title="better-chatbot"
+        title={
+          <span className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/myPDA-logo.png"
+              alt="myPDA"
+              className="size-6 rounded-md"
+            />
+            myPDA
+          </span>
+        }
         href="/"
         enableShortcuts={true}
         onLinkClick={() => {
