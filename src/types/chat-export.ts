@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { UIMessage } from "ai";
+import { z } from "zod";
 import { ChatMetadata } from "./chat";
 import { TipTapMentionJsonContent } from "./util";
 
@@ -16,6 +16,9 @@ export type ChatExport = {
   }>;
   exportedAt: Date;
   expiresAt?: Date;
+  // Global demo/replay flag: when true this snapshot shows in every account's
+  // "Replay" list (read without a user filter). Curated by admins.
+  demo?: boolean;
 };
 
 export const ChatExportByThreadIdSchema = z.object({
@@ -36,6 +39,7 @@ export const ChatExportCreateSchema = z.object({
     }),
   ),
   expiresAt: z.date().nullish(),
+  demo: z.boolean().optional(),
 });
 
 export type ChatExportComment = {
@@ -79,6 +83,7 @@ export type ChatExportSummary = {
   commentCount: number;
   exportedAt: Date;
   expiresAt?: Date;
+  demo?: boolean;
 };
 
 export type ChatExportRepository = {
@@ -86,7 +91,10 @@ export type ChatExportRepository = {
     threadId: string;
     exporterId?: string;
     expiresAt?: Date;
+    demo?: boolean;
   }): Promise<string>;
+  // Global replay list: all demo snapshots, visible to every account.
+  selectDemos(): Promise<ChatExportSummary[]>;
   insert(data: z.infer<typeof ChatExportCreateSchema>): Promise<string>;
   selectById(id: string): Promise<ChatExport | null>;
   selectByIdWithUser(id: string): Promise<ChatExportWithUser | null>;

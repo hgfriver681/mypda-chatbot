@@ -300,7 +300,11 @@
       "sharePublicLinkDescription": "All messages added after sharing will remain private.",
       "creatingLink": "Creating link...",
       "createLink": "Create Link",
-      "linkCopied": "Link copied"
+      "linkCopied": "Link copied",
+      "addToReplay": "Add to replay",
+      "addedToReplay": "Added to replay",
+      "failedToAddToReplay": "Failed",
+      "removedFromReplay": "Removed from replay"
     },
     "ChatPreferences": {
       "title": "Chat Preferences",
@@ -397,7 +401,8 @@
     "joinCommunity": "Join Community",
     "userSettings": "User Settings",
     "mcpServers": "MCP Servers",
-    "more": "More"
+    "more": "More",
+    "replays": "Replays"
   },
   "Archive": {
     "title": "Archive",
@@ -823,5 +828,12 @@
     "group": "Group",
     "groupPlaceholder": "Enter or pick a group name",
     "renameGroup": "Rename group"
+  },
+  "Replay": {
+    "play": "Play",
+    "pause": "Pause",
+    "skip": "Skip",
+    "replayAgain": "Replay",
+    "demoNotice": "Demo replay — a pre-recorded conversation, played back (no live model call)."
   }
 }

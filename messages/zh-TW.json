@@ -179,7 +179,11 @@
       "sharePublicLinkDescription": "分享後新增的所有訊息將保持私有。",
       "creatingLink": "正在建立連結...",
       "createLink": "建立連結",
-      "linkCopied": "連結已複製"
+      "linkCopied": "連結已複製",
+      "addToReplay": "加到重播",
+      "addedToReplay": "已加到重播",
+      "failedToAddToReplay": "操作失敗",
+      "removedFromReplay": "已從重播移除"
     },
     "ChatPreferences": {
       "title": "聊天偏好",
@@ -255,7 +259,8 @@
     "workflow": "工作流",
     "userSettings": "使用者設定",
     "mcpServers": "MCP 伺服器",
-    "more": "更多"
+    "more": "更多",
+    "replays": "重播"
   },
   "Archive": {
     "title": "歸檔",
@@ -520,5 +525,12 @@
         "select": "選擇"
       }
     }
+  },
+  "Replay": {
+    "play": "播放",
+    "pause": "暫停",
+    "skip": "跳過",
+    "replayAgain": "重新播放",
+    "demoNotice": "示範重播——預先錄製的對話回放(不呼叫即時模型)。"
   }
 }

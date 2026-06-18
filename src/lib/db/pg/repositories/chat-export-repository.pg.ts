@@ -6,14 +6,14 @@ import {
   ChatExportSummary,
   ChatExportWithUser,
 } from "app-types/chat-export";
+import { and, count, eq, sql } from "drizzle-orm";
+import z from "zod";
 import { pgDb } from "../db.pg";
 import {
   ChatExportCommentTable,
   ChatExportTable,
   UserTable,
 } from "../schema.pg";
-import { and, count, eq, sql } from "drizzle-orm";
-import z from "zod";
 import { pgChatRepository } from "./chat-repository.pg";
 
 function toChatExport(data: typeof ChatExportTable.$inferSelect): ChatExport {
@@ -25,6 +25,7 @@ function toChatExport(data: typeof ChatExportTable.$inferSelect): ChatExport {
     originalThreadId: data.originalThreadId ?? undefined,
     exportedAt: data.exportedAt,
     expiresAt: data.expiresAt ?? undefined,
+    demo: data.demo,
   };
 }
 
@@ -35,7 +36,7 @@ function toChatExportInsert(
 }
 
 export const pgChatExportRepository: ChatExportRepository = {
-  exportChat: async ({ threadId, exporterId, expiresAt }) => {
+  exportChat: async ({ threadId, exporterId, expiresAt, demo }) => {
     const [thread, messages] = await Promise.all([
       pgChatRepository.selectThread(threadId),
       pgChatRepository.selectMessagesByThreadId(threadId),
@@ -56,7 +57,31 @@ export const pgChatExportRepository: ChatExportRepository = {
       })),
       originalThreadId: threadId,
       expiresAt,
+      demo,
     });
+  },
+
+  selectDemos: async () => {
+    // Global: every account sees the same demo snapshots (no user filter).
+    const result = await pgDb
+      .select({
+        id: ChatExportTable.id,
+        title: ChatExportTable.title,
+        exporterId: ChatExportTable.exporterId,
+        originalThreadId: ChatExportTable.originalThreadId,
+        exportedAt: ChatExportTable.exportedAt,
+        expiresAt: ChatExportTable.expiresAt,
+        demo: ChatExportTable.demo,
+      })
+      .from(ChatExportTable)
+      .where(eq(ChatExportTable.demo, true))
+      .orderBy(sql`${ChatExportTable.exportedAt} DESC`);
+    return result.map((row) => ({
+      ...row,
+      originalThreadId: row.originalThreadId ?? undefined,
+      expiresAt: row.expiresAt ?? undefined,
+      commentCount: 0,
+    })) as ChatExportSummary[];
   },
 
   insert: async (data) => {

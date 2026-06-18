@@ -300,7 +300,11 @@
       "sharePublicLinkDescription": "Alle meldinger lagt til etter deling forblir private.",
       "creatingLink": "Oppretter lenke...",
       "createLink": "Opprett lenke",
-      "linkCopied": "Lenke kopiert"
+      "linkCopied": "Lenke kopiert",
+      "addToReplay": "Legg til avspilling",
+      "addedToReplay": "Lagt til avspilling",
+      "failedToAddToReplay": "Mislyktes",
+      "removedFromReplay": "Fjernet fra avspilling"
     },
     "ChatPreferences": {
       "title": "Chatpreferanser",
@@ -397,7 +401,8 @@
     "joinCommunity": "Bli med i fellesskapet",
     "userSettings": "Brukerinnstillinger",
     "mcpServers": "MCP-servere",
-    "more": "Mer"
+    "more": "Mer",
+    "replays": "Avspillinger"
   },
   "Archive": {
     "title": "Arkiv",
@@ -823,5 +828,12 @@
     "group": "Gruppe",
     "groupPlaceholder": "Skriv eller velg gruppe",
     "renameGroup": "Gi nytt navn"
+  },
+  "Replay": {
+    "play": "Spill av",
+    "pause": "Pause",
+    "skip": "Hopp over",
+    "replayAgain": "Spill igjen",
+    "demoNotice": "Demo-avspilling — forhåndsinnspilt samtale (ingen sanntidsmodell)."
   }
 }

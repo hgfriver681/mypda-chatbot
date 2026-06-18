@@ -39,6 +39,7 @@ import { Skeleton } from "ui/skeleton";
 import { WriteIcon } from "ui/write-icon";
 import { ArchiveDialog } from "../archive-dialog";
 import { AppSidebarMcp } from "./app-sidebar-mcp";
+import { AppSidebarReplay } from "./app-sidebar-replay";
 
 export function AppSidebarMenus({ user }: { user?: BasicUser }) {
   const router = useRouter();
@@ -88,6 +89,8 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
         {/* MCP servers, flat (no collapse) and grouped by user-defined category
             labels. Files / Memories are server panels. See app-sidebar-mcp.tsx. */}
         <AppSidebarMcp />
+        {/* Global replay/demo conversations (shared across all accounts). */}
+        <AppSidebarReplay />
         {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.workflow) */}
         {UI_FLAGS.workflow && (
           <SidebarMenu>

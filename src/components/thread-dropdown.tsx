@@ -1,21 +1,34 @@
 "use client";
+import { addItemToArchiveAction } from "@/app/api/archive/actions";
 import { deleteThreadAction, updateThreadAction } from "@/app/api/chat/actions";
 import { appStore } from "@/app/store";
 import { useToRef } from "@/hooks/use-latest";
+import { authClient } from "auth/client";
+import { UI_FLAGS } from "lib/ui-flags";
+import { getIsUserAdmin } from "lib/user/utils";
 import {
   Archive,
   ChevronRight,
+  Clapperboard,
   Loader,
   PencilLine,
   Trash,
   UploadIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { type PropsWithChildren, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import { safe } from "ts-safe";
 import { Button } from "ui/button";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "ui/command";
 import {
   Dialog,
   DialogClose,
@@ -26,24 +39,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "ui/dialog";
-import { Input } from "ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "ui/popover";
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "ui/dropdown-menu";
-import { useTranslations } from "next-intl";
-import { addItemToArchiveAction } from "@/app/api/archive/actions";
-import { UI_FLAGS } from "lib/ui-flags";
+import { Input } from "ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "ui/popover";
 import { useShallow } from "zustand/shallow";
 import { ChatExportPopup } from "./export/chat-export-popup";
 
@@ -66,6 +69,29 @@ export function ThreadDropdown({
   const router = useRouter();
   const t = useTranslations();
   const push = useToRef(router.push);
+  const { data: session } = authClient.useSession();
+  const isAdmin = getIsUserAdmin(session?.user);
+
+  const handleAddToReplay = async () => {
+    safe()
+      .ifOk(async () => {
+        const res = await fetch("/api/replays", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ threadId }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+      })
+      .ifOk(() => mutate("/api/replays"))
+      .watch(({ isOk, error }) => {
+        if (isOk) {
+          toast.success(t("Chat.Thread.addedToReplay"));
+          setOpen(false);
+        } else {
+          toast.error(error.message || t("Chat.Thread.failedToAddToReplay"));
+        }
+      });
+  };
 
   const [currentThreadId, archiveList] = appStore(
     useShallow((state) => [state.currentThreadId, state.archiveList]),
@@ -151,6 +177,19 @@ export function ThreadDropdown({
                   </div>
                 </ChatExportPopup>
               </CommandItem>
+              {/* Admin-only: promote this real conversation into the global,
+                  cross-account Replay/demo list (snapshot). */}
+              {isAdmin && (
+                <CommandItem
+                  className="cursor-pointer p-0"
+                  onSelect={handleAddToReplay}
+                >
+                  <div className="flex items-center gap-2 w-full px-2 py-1 rounded">
+                    <Clapperboard className="text-foreground" />
+                    <span className="mr-4">{t("Chat.Thread.addToReplay")}</span>
+                  </div>
+                </CommandItem>
+              )}
               <CommandItem className="cursor-pointer p-0">
                 <UpdateThreadNameDialog
                   initialTitle={beforeTitle ?? ""}
@@ -170,7 +209,9 @@ export function ThreadDropdown({
                     <DropdownMenuTrigger asChild>
                       <div className="flex items-center gap-2 w-full px-2 py-1 rounded hover:bg-accent">
                         <Archive className="text-foreground" />
-                        <span className="mr-4">{t("Archive.addToArchive")}</span>
+                        <span className="mr-4">
+                          {t("Archive.addToArchive")}
+                        </span>
                         <ChevronRight className="ml-auto h-4 w-4" />
                       </div>
                     </DropdownMenuTrigger>

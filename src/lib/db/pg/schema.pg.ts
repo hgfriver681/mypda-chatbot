@@ -363,6 +363,8 @@ export const ChatExportTable = pgTable("chat_export", {
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
   expiresAt: timestamp("expires_at"),
+  // Global demo/replay snapshot, shown in every account's Replay list.
+  demo: boolean("demo").notNull().default(false),
 });
 
 export const ChatExportCommentTable = pgTable("chat_export_comment", {

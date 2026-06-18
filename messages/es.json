@@ -178,7 +178,11 @@
       "sharePublicLinkDescription": "Todos los mensajes añadidos después de compartir permanecerán privados.",
       "creatingLink": "Creando enlace...",
       "createLink": "Crear Enlace",
-      "linkCopied": "Enlace copiado"
+      "linkCopied": "Enlace copiado",
+      "addToReplay": "Añadir a reproducción",
+      "addedToReplay": "Añadido a reproducción",
+      "failedToAddToReplay": "Error",
+      "removedFromReplay": "Eliminado de reproducción"
     },
     "ChatPreferences": {
       "title": "Preferencias de Chat",
@@ -254,7 +258,8 @@
     "workflow": "Flujo de Trabajo",
     "userSettings": "Configuración de Usuario",
     "mcpServers": "Servidores MCP",
-    "more": "Más"
+    "more": "Más",
+    "replays": "Reproducciones"
   },
   "Archive": {
     "title": "Archivo",
@@ -518,5 +523,12 @@
         "select": "Seleccionar"
       }
     }
+  },
+  "Replay": {
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "skip": "Saltar",
+    "replayAgain": "Repetir",
+    "demoNotice": "Reproducción de demo: conversación pregrabada (sin modelo en vivo)."
   }
 }

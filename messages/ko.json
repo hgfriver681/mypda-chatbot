@@ -179,7 +179,11 @@
       "sharePublicLinkDescription": "공유 후 추가되는 모든 메시지는 비공개로 유지됩니다.",
       "creatingLink": "링크 생성 중...",
       "createLink": "링크 만들기",
-      "linkCopied": "링크가 복사되었습니다"
+      "linkCopied": "링크가 복사되었습니다",
+      "addToReplay": "리플레이에 추가",
+      "addedToReplay": "리플레이에 추가됨",
+      "failedToAddToReplay": "실패",
+      "removedFromReplay": "리플레이에서 제거됨"
     },
     "ChatPreferences": {
       "title": "채팅 환경설정",
@@ -269,7 +273,8 @@
     "joinCommunity": "커뮤니티 가입",
     "userSettings": "사용자 설정",
     "mcpServers": "MCP 서버",
-    "more": "더 보기"
+    "more": "더 보기",
+    "replays": "리플레이"
   },
   "Archive": {
     "title": "아카이브",
@@ -533,5 +538,12 @@
         "select": "선택"
       }
     }
+  },
+  "Replay": {
+    "play": "재생",
+    "pause": "일시정지",
+    "skip": "건너뛰기",
+    "replayAgain": "다시 재생",
+    "demoNotice": "데모 리플레이 — 사전 녹화된 대화 재생(실시간 호출 없음)."
   }
 }

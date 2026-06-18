@@ -178,7 +178,11 @@
       "sharePublicLinkDescription": "共有後に追加されるすべてのメッセージは非公開に保たれます。",
       "creatingLink": "リンクを作成中...",
       "createLink": "リンクを作成",
-      "linkCopied": "リンクがコピーされました"
+      "linkCopied": "リンクがコピーされました",
+      "addToReplay": "リプレイに追加",
+      "addedToReplay": "リプレイに追加しました",
+      "failedToAddToReplay": "失敗しました",
+      "removedFromReplay": "リプレイから削除"
     },
     "ChatPreferences": {
       "title": "チャット設定",
@@ -254,7 +258,8 @@
     "workflow": "ワークフロー",
     "userSettings": "ユーザー設定",
     "mcpServers": "MCP サーバー",
-    "more": "その他"
+    "more": "その他",
+    "replays": "リプレイ"
   },
   "Archive": {
     "title": "アーカイブ",
@@ -518,5 +523,12 @@
         "select": "選択"
       }
     }
+  },
+  "Replay": {
+    "play": "再生",
+    "pause": "一時停止",
+    "skip": "スキップ",
+    "replayAgain": "もう一度",
+    "demoNotice": "デモのリプレイ — 録画済み会話の再生(ライブ呼び出しなし)。"
   }
 }
