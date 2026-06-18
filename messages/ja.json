@@ -372,7 +372,10 @@
     "toolCustomizationInstructionsPlaceholder": "ツールカスタマイゼーション指示は利用できません。",
     "mcpServerCustomizationPlaceholder": "例：入力値がメールの場合、常にexample@example.comの形式でメールを入力してください。",
     "noInstructions": "なし",
-    "downloadTemplate": "テンプレートをダウンロード"
+    "downloadTemplate": "テンプレートをダウンロード",
+    "fillExample": "例を入力",
+    "clearInput": "クリア",
+    "exampleIsTemplate": "スキーマの型から生成したテンプレートです。呼び出す前に値を編集してください。"
   },
   "Error": {},
   "Info": {

@@ -811,6 +811,9 @@
     "featured": "Fremhevet",
     "featuredDescription": "Fremhevet for alle brukere",
     "noInstructions": "Ingen",
-    "downloadTemplate": "Last ned mal"
+    "downloadTemplate": "Last ned mal",
+    "fillExample": "Fyll inn eksempel",
+    "clearInput": "Tøm",
+    "exampleIsTemplate": "Generert fra skjematypene — rediger verdiene før du kaller."
   }
 }

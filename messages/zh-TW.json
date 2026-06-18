@@ -374,7 +374,10 @@
     "toolCustomizationInstructionsPlaceholder": "工具自定義指令不可用。",
     "mcpServerCustomizationPlaceholder": "例如：如果輸入值是電子郵件，始終以 example@example.com 格式輸入電子郵件。",
     "noInstructions": "無",
-    "downloadTemplate": "下載 MCP 範本"
+    "downloadTemplate": "下載 MCP 範本",
+    "fillExample": "帶入範例",
+    "clearInput": "清空",
+    "exampleIsTemplate": "此為依型別自動產生的模板，呼叫前請依需要修改數值。"
   },
   "Error": {},
   "Info": {

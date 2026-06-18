@@ -372,7 +372,10 @@
     "toolCustomizationInstructionsPlaceholder": "Les instructions de personnalisation d'outils ne sont pas disponibles.",
     "mcpServerCustomizationPlaceholder": "ex. Si la valeur d'entrée est un email, toujours entrer l'email au format exemple@exemple.com.",
     "noInstructions": "Aucun",
-    "downloadTemplate": "Télécharger le modèle"
+    "downloadTemplate": "Télécharger le modèle",
+    "fillExample": "Remplir l'exemple",
+    "clearInput": "Effacer",
+    "exampleIsTemplate": "Généré à partir des types du schéma ; modifiez les valeurs avant l'appel."
   },
   "Error": {},
   "Info": {

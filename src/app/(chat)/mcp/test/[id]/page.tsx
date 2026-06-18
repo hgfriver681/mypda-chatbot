@@ -4,69 +4,43 @@ import {
   callMcpToolAction,
   selectMcpClientAction,
 } from "@/app/api/mcp/actions";
+import JsonView from "@/components/ui/json-view";
+import { isNull, isString, safeJSONParse } from "lib/utils";
 import {
   ArrowLeft,
   ChevronDown,
   ChevronRight,
   ChevronUp,
+  FileJson,
   Loader,
   Search,
-  WandSparkles,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
-import {
-  PropsWithChildren,
-  useEffect,
-  useMemo,
-  useState,
-  useCallback,
-} from "react";
-import { Input } from "ui/input";
-import { Separator } from "ui/separator";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "ui/resizable";
-import { Skeleton } from "ui/skeleton";
-import { Button } from "ui/button";
-import { Textarea } from "ui/textarea";
-import JsonView from "@/components/ui/json-view";
 import { Alert, AlertDescription, AlertTitle } from "ui/alert";
-import { safeJSONParse, isNull, isString } from "lib/utils";
+import { Badge } from "ui/badge";
+import { Button } from "ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from "ui/dialog";
-import { Badge } from "ui/badge";
-import { handleErrorWithToast } from "ui/shared-toast";
-import { generateExampleToolSchemaAction } from "@/app/api/chat/actions";
-import { appStore } from "@/app/store";
+import { Input } from "ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "ui/select";
-import { MCPToolInfo } from "app-types/mcp";
-import { Label } from "ui/label";
-import { safe } from "ts-safe";
-import { useObjectState } from "@/hooks/use-object-state";
-import { useTranslations } from "next-intl";
-import { useChatModels } from "@/hooks/queries/use-chat-models";
-import { ChatModel } from "app-types/chat";
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "ui/resizable";
+import { Separator } from "ui/separator";
+import { handleErrorWithToast } from "ui/shared-toast";
+import { Skeleton } from "ui/skeleton";
+import { Textarea } from "ui/textarea";
 
 // Type definitions
 type SchemaProperty = {
@@ -119,6 +93,87 @@ const createSimplifiedSchema = (schema: any): SimplifiedSchema => {
 
   return simplified;
 };
+
+// Deterministically build a fillable example input from a JSON Schema — no AI.
+// Priority per field: examples[0] -> default -> const -> enum[0] -> a type-based
+// placeholder. Author-provided `examples`/`default` are the runnable, trustworthy
+// values; the type placeholders are a "fill me in" template, never a blank box.
+const MAX_SCHEMA_DEPTH = 5;
+
+const exampleForProp = (prop: any, depth: number): any => {
+  if (!prop || typeof prop !== "object") return null;
+  if (Array.isArray(prop.examples) && prop.examples.length > 0)
+    return prop.examples[0];
+  if ("default" in prop) return prop.default;
+  if ("const" in prop) return prop.const;
+  if (Array.isArray(prop.enum) && prop.enum.length > 0) return prop.enum[0];
+
+  const variant = prop.anyOf?.[0] ?? prop.oneOf?.[0] ?? prop.allOf?.[0];
+  if (variant) return exampleForProp(variant, depth);
+
+  const type = Array.isArray(prop.type) ? prop.type[0] : prop.type;
+  switch (type) {
+    case "string":
+      return "";
+    case "number":
+    case "integer":
+      return 0;
+    case "boolean":
+      return false;
+    case "array":
+      return [];
+    case "object":
+      return buildExampleFromSchema(prop, depth + 1);
+    case "null":
+      return null;
+    default:
+      return "";
+  }
+};
+
+function buildExampleFromSchema(schema: any, depth = 0): Record<string, any> {
+  if (!schema || typeof schema !== "object" || depth > MAX_SCHEMA_DEPTH)
+    return {};
+  // A whole-object example, when the author provided one, wins outright.
+  if (
+    depth === 0 &&
+    Array.isArray(schema.examples) &&
+    schema.examples.length > 0 &&
+    typeof schema.examples[0] === "object"
+  ) {
+    return schema.examples[0];
+  }
+  const props = schema.properties ?? {};
+  const out: Record<string, any> = {};
+  for (const [key, value] of Object.entries(props)) {
+    out[key] = exampleForProp(value, depth);
+  }
+  return out;
+}
+
+// True when the example carries at least one author-provided value (examples/
+// default/const/enum) — i.e. it is more than a bare type skeleton. Used to decide
+// whether to warn the user that the prefilled input is only a template.
+const schemaHasAuthoredExample = (schema: any): boolean => {
+  if (!schema || typeof schema !== "object") return false;
+  if (Array.isArray(schema.examples) && schema.examples.length > 0) return true;
+  const props = schema.properties ?? {};
+  return Object.values(props).some((p: any) => {
+    if (!p || typeof p !== "object") return false;
+    return (
+      (Array.isArray(p.examples) && p.examples.length > 0) ||
+      "default" in p ||
+      "const" in p ||
+      (Array.isArray(p.enum) && p.enum.length > 0)
+    );
+  });
+};
+
+const hasSchemaProperties = (schema: any): boolean =>
+  !!schema &&
+  typeof schema === "object" &&
+  !!schema.properties &&
+  Object.keys(schema.properties).length > 0;
 
 // Recursive schema property renderer component
 const SchemaProperty = ({
@@ -257,128 +312,6 @@ const ToolDescription = ({
   </div>
 );
 
-type GenerateExampleInputJsonDialogProps = {
-  toolInfo: MCPToolInfo;
-  onGenerated: (json: string) => void;
-};
-
-const GenerateExampleInputJsonDialog = ({
-  toolInfo,
-  children,
-  onGenerated,
-}: PropsWithChildren<GenerateExampleInputJsonDialogProps>) => {
-  const currentModelName = appStore((state) => state.chatModel);
-  const t = useTranslations();
-
-  const { data: providers } = useChatModels();
-
-  const [option, setOption] = useObjectState({
-    open: false,
-    model: currentModelName,
-    prompt: "",
-    loading: false,
-  });
-
-  const generateExampleSchema = useCallback(() => {
-    safe(() => setOption({ loading: true }))
-      .map(() =>
-        generateExampleToolSchemaAction({
-          model: option.model,
-          toolInfo: toolInfo,
-          prompt: option.prompt,
-        }),
-      )
-      .ifOk((result) => {
-        onGenerated(JSON.stringify(result, null, 2));
-      })
-      .watch(() => {
-        setOption({
-          loading: false,
-          prompt: "",
-          model: currentModelName,
-          open: false,
-        });
-      })
-      .ifFail(handleErrorWithToast);
-  }, [option, toolInfo, currentModelName, onGenerated]);
-
-  return (
-    <Dialog open={option.open} onOpenChange={(open) => setOption({ open })}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            <p>{t("MCP.generateExampleInputJSON")}</p>
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            {t("MCP.enterPromptToGenerateExampleInputJSON")}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col gap-2 py-4 text-foreground">
-          <Label>Model</Label>
-          <Select
-            value={JSON.stringify(option.model ?? "{}")}
-            onValueChange={(value) => {
-              const model = JSON.parse(value) as ChatModel;
-              setOption({ model });
-            }}
-          >
-            <SelectTrigger className="min-w-48">
-              <SelectValue placeholder="Select a model" />
-            </SelectTrigger>
-            <SelectContent>
-              {providers?.map((provider) => (
-                <SelectGroup key={provider.provider}>
-                  <SelectLabel>{provider.provider}</SelectLabel>
-                  {provider.models.map((model) => (
-                    <SelectItem
-                      key={model.name}
-                      value={JSON.stringify({
-                        provider: provider.provider,
-                        model: model.name,
-                      })}
-                    >
-                      {model.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              ))}
-            </SelectContent>
-          </Select>
-          <div className="my-2" />
-          <Label>
-            Prompt{" "}
-            <span className="text-muted-foreground text-xs">
-              {"("}optional{")"}
-            </span>
-          </Label>
-
-          <Textarea
-            disabled={option.loading}
-            className="resize-none h-28 placeholder:text-xs"
-            value={option.prompt}
-            onChange={(e) => setOption({ prompt: e.target.value })}
-            placeholder={t("MCP.enterPromptToGenerateExampleInputJSON")}
-          />
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="ghost">{t("Common.cancel")}</Button>
-          </DialogClose>
-
-          <Button variant="default" onClick={generateExampleSchema}>
-            {option.loading ? (
-              <Loader className="size-4 animate-spin" />
-            ) : (
-              t("Common.generate")
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 export default function Page() {
   const { id } = useParams() as { id: string };
 
@@ -418,6 +351,27 @@ export default function Page() {
     if (!selectedTool?.inputSchema) return null;
     return createSimplifiedSchema(selectedTool.inputSchema);
   }, [selectedTool]);
+
+  // Prefill text for the Input JSON box: a runnable example (author-provided
+  // values when present, otherwise a fillable type template). "{}" when the tool
+  // takes no arguments.
+  const exampleInputJson = useMemo(() => {
+    if (!hasSchemaProperties(selectedTool?.inputSchema)) return "{}";
+    return JSON.stringify(
+      buildExampleFromSchema(selectedTool!.inputSchema),
+      null,
+      2,
+    );
+  }, [selectedTool]);
+
+  // The prefill is only a bare type template (no author-provided example/default/
+  // enum) — warn the user so they don't assume it will run as-is.
+  const isTemplateExampleOnly = useMemo(
+    () =>
+      hasSchemaProperties(selectedTool?.inputSchema) &&
+      !schemaHasAuthoredExample(selectedTool?.inputSchema),
+    [selectedTool],
+  );
 
   const toggleDescription = () => setShowFullDescription(!showFullDescription);
   const toggleInputSchema = () => setShowInputSchema(!showInputSchema);
@@ -489,10 +443,11 @@ export default function Page() {
     setCallResult(null);
     setIsCallLoading(false);
     setJsonError(null);
-    setJsonInput("");
+    // Prefill a runnable example instead of leaving the box blank.
+    setJsonInput(exampleInputJson);
     setShowInputSchema(false);
     setShowFullDescription(false);
-  }, [selectedToolIndex]);
+  }, [selectedToolIndex, exampleInputJson]);
 
   useEffect(() => {
     setSelectedToolIndex(0);
@@ -645,19 +600,27 @@ export default function Page() {
                             <h5 className="text-xs font-medium flex items-center">
                               Input JSON
                             </h5>
-                            <GenerateExampleInputJsonDialog
-                              toolInfo={selectedTool}
-                              onGenerated={(json) => setJsonInput(json)}
-                            >
+                            <div className="flex items-center gap-1">
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 className="h-6 px-2 text-xs"
+                                onClick={() =>
+                                  handleInputChange(exampleInputJson)
+                                }
                               >
-                                {t("MCP.createInputWithAI")}
-                                <WandSparkles className="ml-1 size-3" />
+                                <FileJson className="mr-1 size-3" />
+                                {t("MCP.fillExample")}
                               </Button>
-                            </GenerateExampleInputJsonDialog>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2 text-xs text-muted-foreground"
+                                onClick={() => handleInputChange("")}
+                              >
+                                {t("MCP.clearInput")}
+                              </Button>
+                            </div>
                           </div>
                           <Textarea
                             autoFocus
@@ -675,6 +638,11 @@ export default function Page() {
                                 {jsonError}
                               </AlertDescription>
                             </Alert>
+                          )}
+                          {isTemplateExampleOnly && (
+                            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+                              {t("MCP.exampleIsTemplate")}
+                            </p>
                           )}
                         </div>
                       </div>

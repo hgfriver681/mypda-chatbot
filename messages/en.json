@@ -811,6 +811,9 @@
     "publicDescription": "Featured for all users to use",
     "featured": "Featured",
     "featuredDescription": "Featured for all users to use",
-    "downloadTemplate": "Download template"
+    "downloadTemplate": "Download template",
+    "fillExample": "Fill example",
+    "clearInput": "Clear",
+    "exampleIsTemplate": "Generated from the schema types — edit the values as needed before calling."
   }
 }

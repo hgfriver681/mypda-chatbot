@@ -71,5 +71,12 @@ process.env：
     `RECOMMENDED_MCPS`）多了「myPDA 範本」一鍵帶入 `localhost:8787/mcp` + demo-key。
   - 適用：UI 與 MCP 同側（都內網／都外網）即開箱即用；雲端 UI 打內網 MCP 不支援
     （請客戶自己開 tunnel）。
+  - 工具測試頁（`src/app/(chat)/mcp/test/[id]/page.tsx`）：移除「用 AI 建立輸入」，
+    改為**從 inputSchema 自動帶入可運行範例**（純前端、零 AI）。優先序
+    `examples[0] → default → const → enum[0] → 型別佔位`；有作者範例就用真值、否則
+    給可填型別模板並標示「依型別產生」提示，永不留空白框。附「帶入範例 / 清空」兩鈕。
+    範本工具用 `Field(examples=[...])`（Python）把可運行範例帶進 schema。
+  - 註記：`mcp-templates/` 已從 `tsconfig.json` 與 `biome.json` 排除（各為獨立子專案，
+    不納入主 app 的 typecheck/lint；改範本後用 `scripts/build-mcp-templates.sh` 重打包）。
 
 最後更新：2026-06-18

@@ -387,7 +387,10 @@
     "toolCustomizationInstructionsPlaceholder": "도구 사용자 지정 지침이 없습니다.",
     "mcpServerCustomizationPlaceholder": "예) 이 MCP 서버의 툴중에 입력값이 email인 경우 항상 example@example.com 형식으로 입력해주세요.",
     "noInstructions": "없음",
-    "downloadTemplate": "템플릿 다운로드"
+    "downloadTemplate": "템플릿 다운로드",
+    "fillExample": "예시 채우기",
+    "clearInput": "지우기",
+    "exampleIsTemplate": "스키마 타입에서 생성된 템플릿입니다. 호출 전에 값을 수정하세요."
   },
   "Error": {},
   "Info": {

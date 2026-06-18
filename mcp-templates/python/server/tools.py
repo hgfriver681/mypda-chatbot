@@ -13,6 +13,13 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Annotated
+
+from pydantic import Field
+
+# 用 Field(examples=[...]) 為參數附上「可運行的範例值」。
+# 這些範例會進到工具的 inputSchema，myPDA 測試頁會自動帶入，
+# 讓使用者不必對著空白框猜要填什麼（改成你自己的工具時也照樣加）。
 
 
 def register_tools(mcp) -> None:
@@ -26,7 +33,7 @@ def register_tools(mcp) -> None:
 
     # echo：回傳傳入的同一段文字。
     @mcp.tool()
-    def echo(text: str) -> str:
+    def echo(text: Annotated[str, Field(examples=["hello"])]) -> str:
         """Echo back the given text."""
         return text
 
@@ -40,6 +47,9 @@ def register_tools(mcp) -> None:
 
     # add：把兩個數字相加，回傳總和。
     @mcp.tool()
-    def add(a: float, b: float) -> float:
+    def add(
+        a: Annotated[float, Field(examples=[2])],
+        b: Annotated[float, Field(examples=[3])],
+    ) -> float:
         """Add two numbers and return the sum."""
         return a + b
