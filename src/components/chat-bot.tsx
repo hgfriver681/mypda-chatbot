@@ -28,6 +28,7 @@ import {
 } from "app-types/chat";
 import { useToRef } from "@/hooks/use-latest";
 import { isShortcutEvent, Shortcuts } from "lib/keyboard-shortcuts";
+import { UI_FLAGS } from "lib/ui-flags";
 import { Button } from "ui/button";
 import { deleteThreadAction } from "@/app/api/chat/actions";
 import { useRouter } from "next/navigation";
@@ -113,7 +114,11 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
     threadId,
   });
 
-  const [showParticles, setShowParticles] = useState(isFirstTime);
+  // Idle light-rays/particles disabled per docs/DISABLED_FEATURES.md
+  // (UI_FLAGS.idleParticles). When off, particles never show.
+  const [showParticles, setShowParticles] = useState<boolean>(
+    UI_FLAGS.idleParticles && isFirstTime,
+  );
 
   const onFinish = useCallback(() => {
     const messages = latestRef.current.messages;
@@ -323,7 +328,9 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
 
   const handleFocus = useCallback(() => {
     setShowParticles(false);
-    debounce(() => setShowParticles(true), 60000);
+    if (UI_FLAGS.idleParticles) {
+      debounce(() => setShowParticles(true), 60000);
+    }
   }, []);
 
   const handleScroll = useCallback(() => {

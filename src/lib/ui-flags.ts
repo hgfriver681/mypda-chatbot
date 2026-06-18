@@ -16,4 +16,6 @@ export const UI_FLAGS = {
   voiceChat: false,
   // Header「切換臨時聊天 / Toggle temporary chat」button
   temporaryChat: false,
+  // Chat idle animation (light rays + particles after ~60s of inactivity)
+  idleParticles: false,
 } as const;
