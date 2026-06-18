@@ -62,14 +62,14 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
                   router.refresh();
                 }}
               >
-                <SidebarMenuButton className="flex font-semibold group/new-chat bg-input/20 border border-border/40">
+                <SidebarMenuButton className="flex font-semibold group/new-chat bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground">
                   <WriteIcon className="size-4" />
                   {t("Layout.newChat")}
                   <div className="flex items-center gap-1 text-xs font-medium ml-auto opacity-0 group-hover/new-chat:opacity-100 transition-opacity">
                     {getShortcutKeyList(Shortcuts.openNewChat).map((key) => (
                       <span
                         key={key}
-                        className="border w-5 h-5 flex items-center justify-center bg-accent rounded"
+                        className="border border-primary-foreground/20 w-5 h-5 flex items-center justify-center bg-primary-foreground/15 rounded"
                       >
                         {key}
                       </span>
