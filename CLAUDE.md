@@ -44,8 +44,9 @@ process.env：
 
 ## 自訂功能（與上游不同處）
 
-- Memory（myPDA MCP 併入）、Files UI、聊天存進 Memory、search_memory 動畫等，
-  詳見專案外部記憶筆記。
+- Memory（myPDA MCP 併入）、Files UI、聊天存進 Memory 等，詳見專案外部記憶筆記。
+  （註：原本 `search_memory` 工具呼叫上方那張淺黃底「Through the archive」動畫卡片
+  `memory-search-animation.tsx` 已依需求**移除**;平台內建的工具呼叫塊保留。）
 - Sidebar 結構（以 MCP server 為主軸 + 使用者可編輯分組，**扁平、ChatGPT 式、不收合**）：
   - `src/components/layouts/app-sidebar-mcp.tsx`：頂層「新聊天 / MCP 伺服器」；其餘是 MCP
     server 的面板，依使用者自訂 `category` 分組（單層、自由命名，`未分組` 排最後）。

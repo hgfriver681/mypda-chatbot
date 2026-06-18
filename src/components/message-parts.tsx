@@ -1,71 +1,70 @@
 "use client";
 
-import { FileUIPart, getToolName, ToolUIPart, UIMessage } from "ai";
+import { MarkImportantButton } from "@/components/memory/mark-important-button";
+import { useCopy } from "@/hooks/use-copy";
+import type { UseChatHelpers } from "@ai-sdk/react";
+import { FileUIPart, ToolUIPart, UIMessage, getToolName } from "ai";
+import { cn, safeJSONParse, truncateString } from "lib/utils";
 import {
   Check,
-  Copy,
-  Loader,
-  Pencil,
   ChevronDownIcon,
-  ChevronUp,
-  RefreshCw,
-  X,
-  Trash2,
   ChevronRight,
-  TriangleAlert,
-  HammerIcon,
+  ChevronUp,
+  Copy,
+  Download,
   EllipsisIcon,
   FileIcon,
-  Download,
+  HammerIcon,
+  Loader,
+  Pencil,
+  RefreshCw,
+  Trash2,
+  TriangleAlert,
+  X,
 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "ui/tooltip";
-import { Button } from "ui/button";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "ui/badge";
-import { Markdown } from "./markdown";
-import { cn, safeJSONParse, truncateString } from "lib/utils";
+import { Button } from "ui/button";
 import JsonView from "ui/json-view";
-import { useMemo, useState, memo, useEffect, useRef, useCallback } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "ui/tooltip";
+import { Markdown } from "./markdown";
 import { MessageEditor } from "./message-editor";
-import type { UseChatHelpers } from "@ai-sdk/react";
-import { useCopy } from "@/hooks/use-copy";
-import { MarkImportantButton } from "@/components/memory/mark-important-button";
-import { MemorySearchAnimation } from "@/components/memory/memory-search-animation";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { SelectModel } from "./select-model";
 import {
   deleteMessageAction,
   deleteMessagesByChatIdAfterTimestampAction,
 } from "@/app/api/chat/actions";
+import { AnimatePresence, motion } from "framer-motion";
+import { SelectModel } from "./select-model";
 
+import { ChatMetadata, ChatModel, ManualToolConfirmTag } from "app-types/chat";
 import { toast } from "sonner";
 import { safe } from "ts-safe";
-import { ChatMetadata, ChatModel, ManualToolConfirmTag } from "app-types/chat";
 
-import { useTranslations } from "next-intl";
 import { extractMCPToolId } from "lib/ai/mcp/mcp-tool-id";
+import { useTranslations } from "next-intl";
 import { Separator } from "ui/separator";
 
-import { TextShimmer } from "ui/text-shimmer";
-import equal from "lib/equal";
 import {
   VercelAIWorkflowToolStreamingResult,
   VercelAIWorkflowToolStreamingResultTag,
 } from "app-types/workflow";
-import { Avatar, AvatarFallback, AvatarImage } from "ui/avatar";
 import { DefaultToolName, ImageToolName } from "lib/ai/tools";
+import equal from "lib/equal";
 import {
   Shortcut,
   getShortcutKeyList,
   isShortcutEvent,
 } from "lib/keyboard-shortcuts";
+import { Avatar, AvatarFallback, AvatarImage } from "ui/avatar";
+import { TextShimmer } from "ui/text-shimmer";
 
-import { WorkflowInvocation } from "./tool-invocation/workflow-invocation";
-import dynamic from "next/dynamic";
-import { notify } from "lib/notify";
-import { ModelProviderIcon } from "ui/model-provider-icon";
 import { appStore } from "@/app/store";
 import { BACKGROUND_COLORS, EMOJI_DATA } from "lib/const";
+import { notify } from "lib/notify";
+import dynamic from "next/dynamic";
+import { ModelProviderIcon } from "ui/model-provider-icon";
+import { WorkflowInvocation } from "./tool-invocation/workflow-invocation";
 
 type MessagePart = UIMessage["parts"][number];
 type TextMessagePart = Extract<MessagePart, { type: "text" }>;
@@ -938,14 +937,6 @@ export const ToolMessagePart = memo(
       return extractMCPToolId(toolName);
     }, [toolName]);
 
-    // Decorative "Through the archive" animation, shown additively above the
-    // built-in tool block whenever the memory search tool runs. Additive only —
-    // BC's native tool-call rendering/animation is preserved.
-    const isMemorySearch = useMemo(
-      () => mcpToolName === "search_memory" || toolName.includes("search_memory"),
-      [mcpToolName, toolName],
-    );
-
     const isExpanded = useMemo(() => {
       return expanded || result === null || isWorkflowTool;
     }, [expanded, result, isWorkflowTool]);
@@ -960,12 +951,6 @@ export const ToolMessagePart = memo(
 
     return (
       <div className="group w-full">
-        {isMemorySearch && (
-          <MemorySearchAnimation
-            query={(input as any)?.query}
-            done={isCompleted}
-          />
-        )}
         {CustomToolComponent ? (
           CustomToolComponent
         ) : (
