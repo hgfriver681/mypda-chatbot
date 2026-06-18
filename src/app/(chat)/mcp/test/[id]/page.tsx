@@ -5,9 +5,11 @@ import {
   selectMcpClientAction,
 } from "@/app/api/mcp/actions";
 import JsonView from "@/components/ui/json-view";
-import { isNull, isString, safeJSONParse } from "lib/utils";
+import { cn, isNull, isString, safeJSONParse } from "lib/utils";
 import {
+  AlertCircle,
   ArrowLeft,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   ChevronUp,
@@ -664,9 +666,30 @@ export default function Page() {
                       {/* Results Display */}
                       {!isNull(callResult) && (
                         <div className="space-y-2">
-                          <h5 className="text-xs font-medium">Result</h5>
+                          <div className="flex items-center gap-2">
+                            <h5 className="text-xs font-medium">Result</h5>
+                            {callResult.success &&
+                            callResult.data?.isError !== true ? (
+                              <Badge className="gap-1 border-transparent bg-green-500/15 text-green-700 dark:text-green-400">
+                                <CheckCircle2 className="size-3" />
+                                {t("MCP.callSucceeded")}
+                              </Badge>
+                            ) : (
+                              <Badge className="gap-1 border-transparent bg-destructive/15 text-destructive">
+                                <AlertCircle className="size-3" />
+                                {t("MCP.callFailed")}
+                              </Badge>
+                            )}
+                          </div>
                           {callResult.success ? (
-                            <div className="border border-input rounded-md p-4 max-h-[300px] overflow-auto">
+                            <div
+                              className={cn(
+                                "border rounded-md p-4 max-h-[300px] overflow-auto",
+                                callResult.data?.isError === true
+                                  ? "border-destructive/40"
+                                  : "border-green-500/40",
+                              )}
+                            >
                               <JsonView
                                 data={callResult.data}
                                 initialExpandDepth={2}

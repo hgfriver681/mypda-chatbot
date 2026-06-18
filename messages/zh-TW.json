@@ -377,7 +377,9 @@
     "downloadTemplate": "下載 MCP 範本",
     "fillExample": "帶入範例",
     "clearInput": "清空",
-    "exampleIsTemplate": "此為依型別自動產生的模板，呼叫前請依需要修改數值。"
+    "exampleIsTemplate": "此為依型別自動產生的模板，呼叫前請依需要修改數值。",
+    "callSucceeded": "成功",
+    "callFailed": "失敗"
   },
   "Error": {},
   "Info": {

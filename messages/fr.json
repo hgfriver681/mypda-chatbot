@@ -375,7 +375,9 @@
     "downloadTemplate": "Télécharger le modèle",
     "fillExample": "Remplir l'exemple",
     "clearInput": "Effacer",
-    "exampleIsTemplate": "Généré à partir des types du schéma ; modifiez les valeurs avant l'appel."
+    "exampleIsTemplate": "Généré à partir des types du schéma ; modifiez les valeurs avant l'appel.",
+    "callSucceeded": "Réussi",
+    "callFailed": "Échec"
   },
   "Error": {},
   "Info": {

@@ -814,6 +814,8 @@
     "downloadTemplate": "Last ned mal",
     "fillExample": "Fyll inn eksempel",
     "clearInput": "Tøm",
-    "exampleIsTemplate": "Generert fra skjematypene — rediger verdiene før du kaller."
+    "exampleIsTemplate": "Generert fra skjematypene — rediger verdiene før du kaller.",
+    "callSucceeded": "Vellykket",
+    "callFailed": "Mislyktes"
   }
 }

@@ -375,7 +375,9 @@
     "downloadTemplate": "Descargar plantilla",
     "fillExample": "Rellenar ejemplo",
     "clearInput": "Limpiar",
-    "exampleIsTemplate": "Generado a partir de los tipos del esquema; edita los valores antes de llamar."
+    "exampleIsTemplate": "Generado a partir de los tipos del esquema; edita los valores antes de llamar.",
+    "callSucceeded": "Correcto",
+    "callFailed": "Error"
   },
   "Error": {},
   "Info": {

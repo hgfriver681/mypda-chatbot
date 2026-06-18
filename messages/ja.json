@@ -375,7 +375,9 @@
     "downloadTemplate": "テンプレートをダウンロード",
     "fillExample": "例を入力",
     "clearInput": "クリア",
-    "exampleIsTemplate": "スキーマの型から生成したテンプレートです。呼び出す前に値を編集してください。"
+    "exampleIsTemplate": "スキーマの型から生成したテンプレートです。呼び出す前に値を編集してください。",
+    "callSucceeded": "成功",
+    "callFailed": "失敗"
   },
   "Error": {},
   "Info": {

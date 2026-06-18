@@ -814,6 +814,8 @@
     "downloadTemplate": "Download template",
     "fillExample": "Fill example",
     "clearInput": "Clear",
-    "exampleIsTemplate": "Generated from the schema types — edit the values as needed before calling."
+    "exampleIsTemplate": "Generated from the schema types — edit the values as needed before calling.",
+    "callSucceeded": "Success",
+    "callFailed": "Failed"
   }
 }

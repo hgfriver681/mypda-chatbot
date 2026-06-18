@@ -390,7 +390,9 @@
     "downloadTemplate": "템플릿 다운로드",
     "fillExample": "예시 채우기",
     "clearInput": "지우기",
-    "exampleIsTemplate": "스키마 타입에서 생성된 템플릿입니다. 호출 전에 값을 수정하세요."
+    "exampleIsTemplate": "스키마 타입에서 생성된 템플릿입니다. 호출 전에 값을 수정하세요.",
+    "callSucceeded": "성공",
+    "callFailed": "실패"
   },
   "Error": {},
   "Info": {
