@@ -69,6 +69,7 @@ const staticModels = {
     "qwen3-32b": groq("qwen/qwen3-32b"),
   },
   openRouter: {
+    "minimax-m3": openrouter("minimax/minimax-m3"),
     "gpt-oss-20b:free": openrouter("openai/gpt-oss-20b:free"),
     "qwen3-8b:free": openrouter("qwen/qwen3-8b:free"),
     "qwen3-14b:free": openrouter("qwen/qwen3-14b:free"),

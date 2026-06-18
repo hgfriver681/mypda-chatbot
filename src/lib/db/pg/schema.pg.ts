@@ -7,6 +7,8 @@ import {
   text,
   timestamp,
   json,
+  jsonb,
+  integer,
   uuid,
   boolean,
   unique,
@@ -379,3 +381,70 @@ export const ChatExportCommentTable = pgTable("chat_export_comment", {
 export type ArchiveEntity = typeof ArchiveTable.$inferSelect;
 export type ArchiveItemEntity = typeof ArchiveItemTable.$inferSelect;
 export type BookmarkEntity = typeof BookmarkTable.$inferSelect;
+
+// ── myPDA Memory (merged from myPDA-memory-mcp) ───────────────────────────
+// SQL table names are kept verbatim (memories / api_keys / invocations) so the
+// existing Python FastMCP server keeps working against the same Postgres via
+// PostgREST. The only change vs the original schema.sql is that `account_id`
+// now references better-chatbot's `user` table instead of Supabase auth.users,
+// because Better Auth is the single identity (tenant isolation enforced in the
+// app/server layer, same way the MCP server already does it).
+export const MemoryTable = pgTable(
+  "memories",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    accountId: uuid("account_id")
+      .notNull()
+      .references(() => UserTable.id, { onDelete: "cascade" }),
+    title: text("title"),
+    content: text("content").notNull(),
+    structured: jsonb("structured"),
+    kind: text("kind").notNull().default("text"),
+    summary: text("summary"),
+    categories: text("categories")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    source: text("source"),
+    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("memories_account_idx").on(t.accountId, t.createdAt)],
+);
+
+export const MemoryApiKeyTable = pgTable(
+  "api_keys",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    accountId: uuid("account_id")
+      .notNull()
+      .references(() => UserTable.id, { onDelete: "cascade" }),
+    keyHash: text("key_hash").notNull().unique(),
+    prefix: text("prefix").notNull(),
+    name: text("name"),
+    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    lastUsedAt: timestamp("last_used_at"),
+    revokedAt: timestamp("revoked_at"),
+  },
+  (t) => [index("api_keys_account_idx").on(t.accountId)],
+);
+
+export const MemoryInvocationTable = pgTable(
+  "invocations",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    accountId: uuid("account_id")
+      .notNull()
+      .references(() => UserTable.id, { onDelete: "cascade" }),
+    tool: text("tool").notNull(),
+    query: text("query"),
+    retrieved: jsonb("retrieved"),
+    latencyMs: integer("latency_ms"),
+    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("invocations_account_idx").on(t.accountId, t.createdAt)],
+);
+
+export type MemoryEntity = typeof MemoryTable.$inferSelect;
+export type MemoryApiKeyEntity = typeof MemoryApiKeyTable.$inferSelect;
+export type MemoryInvocationEntity = typeof MemoryInvocationTable.$inferSelect;

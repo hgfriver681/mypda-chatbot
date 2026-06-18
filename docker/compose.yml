@@ -4,7 +4,7 @@ services:
       context: ..
       dockerfile: ./docker/Dockerfile
     ports:
-      - '3000:3000'
+      - '9401:3000'
     environment:
       - NO_HTTPS=1
     env_file:
@@ -22,6 +22,10 @@ services:
     image: postgres:17
     env_file:
       - .env
+    # Dev-only: publish Postgres to the host so we can run drizzle migrations and
+    # local TDD against it (host 55432 -> container 5432). Safe to remove for prod.
+    ports:
+      - "55432:5432"
     networks:
       - better-chatbot-networks
     volumes:

@@ -28,6 +28,8 @@ import { useMemo, useState, memo, useEffect, useRef, useCallback } from "react";
 import { MessageEditor } from "./message-editor";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { useCopy } from "@/hooks/use-copy";
+import { MarkImportantButton } from "@/components/memory/mark-important-button";
+import { MemorySearchAnimation } from "@/components/memory/memory-search-animation";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { SelectModel } from "./select-model";
@@ -392,6 +394,7 @@ export const AssistMessagePart = memo(function AssistMessagePart({
           </Tooltip>
           {!readonly && (
             <>
+              <MarkImportantButton threadId={threadId} messageId={message.id} />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div>
@@ -935,6 +938,14 @@ export const ToolMessagePart = memo(
       return extractMCPToolId(toolName);
     }, [toolName]);
 
+    // Decorative "Through the archive" animation, shown additively above the
+    // built-in tool block whenever the memory search tool runs. Additive only —
+    // BC's native tool-call rendering/animation is preserved.
+    const isMemorySearch = useMemo(
+      () => mcpToolName === "search_memory" || toolName.includes("search_memory"),
+      [mcpToolName, toolName],
+    );
+
     const isExpanded = useMemo(() => {
       return expanded || result === null || isWorkflowTool;
     }, [expanded, result, isWorkflowTool]);
@@ -949,6 +960,12 @@ export const ToolMessagePart = memo(
 
     return (
       <div className="group w-full">
+        {isMemorySearch && (
+          <MemorySearchAnimation
+            query={(input as any)?.query}
+            done={isCompleted}
+          />
+        )}
         {CustomToolComponent ? (
           CustomToolComponent
         ) : (

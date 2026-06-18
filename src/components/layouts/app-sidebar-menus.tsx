@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { MCPIcon } from "ui/mcp-icon";
 import { WriteIcon } from "ui/write-icon";
 import {
+  FolderIcon,
   FolderOpenIcon,
   FolderSearchIcon,
   PlusIcon,
@@ -31,6 +32,7 @@ import { ArchiveDialog } from "../archive-dialog";
 import { getIsUserAdmin } from "lib/user/utils";
 import { BasicUser } from "app-types/user";
 import { AppSidebarAdmin } from "./app-sidebar-menu-admin";
+import { AppSidebarMemory } from "./app-sidebar-memory";
 
 export function AppSidebarMenus({ user }: { user?: BasicUser }) {
   const router = useRouter();
@@ -101,6 +103,19 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
             </SidebarMenuItem>
           </Tooltip>
         </SidebarMenu>
+        <SidebarMenu>
+          <Tooltip>
+            <SidebarMenuItem>
+              <Link href="/files">
+                <SidebarMenuButton className="font-semibold">
+                  <FolderIcon className="size-4" />
+                  Files
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          </Tooltip>
+        </SidebarMenu>
+        <AppSidebarMemory />
         {getIsUserAdmin(user) && <AppSidebarAdmin />}
         <SidebarMenu className="group/archive">
           <Tooltip>
