@@ -821,6 +821,7 @@
     "callFailed": "Mislyktes",
     "ungrouped": "Ugruppert",
     "group": "Gruppe",
-    "groupPlaceholder": "Skriv eller velg gruppe"
+    "groupPlaceholder": "Skriv eller velg gruppe",
+    "renameGroup": "Gi nytt navn"
   }
 }

@@ -382,7 +382,8 @@
     "callFailed": "失敗",
     "ungrouped": "未分類",
     "group": "グループ",
-    "groupPlaceholder": "グループ名を入力または選択"
+    "groupPlaceholder": "グループ名を入力または選択",
+    "renameGroup": "グループ名を変更"
   },
   "Error": {},
   "Info": {

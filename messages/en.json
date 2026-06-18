@@ -821,6 +821,7 @@
     "callFailed": "Failed",
     "ungrouped": "Ungrouped",
     "group": "Group",
-    "groupPlaceholder": "Enter or pick a group name"
+    "groupPlaceholder": "Enter or pick a group name",
+    "renameGroup": "Rename group"
   }
 }

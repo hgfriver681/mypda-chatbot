@@ -2,14 +2,14 @@
 import { mcpClientsManager } from "lib/ai/mcp/mcp-manager";
 import { z } from "zod";
 
-import { McpServerTable } from "lib/db/pg/schema.pg";
-import { mcpOAuthRepository, mcpRepository } from "lib/db/repository";
 import {
   canCreateMCP,
   canManageMCPServer,
   canShareMCPServer,
   getCurrentUser,
 } from "lib/auth/permissions";
+import { McpServerTable } from "lib/db/pg/schema.pg";
+import { mcpOAuthRepository, mcpRepository } from "lib/db/repository";
 
 export async function selectMcpClientsAction() {
   // Get current user to filter MCP servers
@@ -153,6 +153,20 @@ export async function updateMcpCategoryAction(
     throw new Error("You don't have permission to edit this MCP connection");
   }
   await mcpRepository.updateCategory(id, category);
+}
+
+export async function renameMcpCategoryAction(
+  oldName: string,
+  newName: string,
+) {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    throw new Error("You must be logged in to edit MCP connections");
+  }
+  if (!newName.trim()) {
+    throw new Error("Group name is required");
+  }
+  await mcpRepository.renameCategory(currentUser.id, oldName, newName.trim());
 }
 
 export async function authorizeMcpClientAction(id: string) {

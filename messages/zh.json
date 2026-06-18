@@ -384,7 +384,8 @@
     "callFailed": "失败",
     "ungrouped": "未分组",
     "group": "分组",
-    "groupPlaceholder": "输入或选择分组名称"
+    "groupPlaceholder": "输入或选择分组名称",
+    "renameGroup": "重命名分组"
   },
   "Error": {},
   "Info": {

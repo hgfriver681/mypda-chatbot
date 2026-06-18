@@ -104,6 +104,11 @@ export interface MCPRepository {
   existsByServerName(name: string): Promise<boolean>;
   updateVisibility(id: string, visibility: "public" | "private"): Promise<void>;
   updateCategory(id: string, category: string | null): Promise<void>;
+  renameCategory(
+    userId: string,
+    oldName: string,
+    newName: string,
+  ): Promise<void>;
   updateToolInfo(id: string, toolInfo: MCPToolInfo[]): Promise<void>;
   updateConnectionStatus(
     id: string,

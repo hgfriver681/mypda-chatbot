@@ -397,7 +397,8 @@
     "callFailed": "실패",
     "ungrouped": "그룹 없음",
     "group": "그룹",
-    "groupPlaceholder": "그룹 이름 입력 또는 선택"
+    "groupPlaceholder": "그룹 이름 입력 또는 선택",
+    "renameGroup": "그룹 이름 변경"
   },
   "Error": {},
   "Info": {

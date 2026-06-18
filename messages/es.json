@@ -382,7 +382,8 @@
     "callFailed": "Error",
     "ungrouped": "Sin grupo",
     "group": "Grupo",
-    "groupPlaceholder": "Escribe o elige un grupo"
+    "groupPlaceholder": "Escribe o elige un grupo",
+    "renameGroup": "Renombrar grupo"
   },
   "Error": {},
   "Info": {

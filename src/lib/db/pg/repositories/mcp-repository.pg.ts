@@ -1,8 +1,8 @@
+import type { MCPRepository } from "app-types/mcp";
+import { and, desc, eq, or } from "drizzle-orm";
+import { generateUUID } from "lib/utils";
 import { pgDb as db } from "../db.pg";
 import { McpServerTable, UserTable } from "../schema.pg";
-import { eq, or, desc } from "drizzle-orm";
-import { generateUUID } from "lib/utils";
-import type { MCPRepository } from "app-types/mcp";
 
 export const pgMcpRepository: MCPRepository = {
   async save(server) {
@@ -86,6 +86,22 @@ export const pgMcpRepository: MCPRepository = {
       .update(McpServerTable)
       .set({ category: value, updatedAt: new Date() })
       .where(eq(McpServerTable.id, id));
+  },
+
+  async renameCategory(userId, oldName, newName) {
+    // Rename a whole group: move all of this user's servers from oldName to
+    // newName in one shot. Scoped to the user's own servers.
+    const value = newName.trim();
+    if (!value) return;
+    await db
+      .update(McpServerTable)
+      .set({ category: value, updatedAt: new Date() })
+      .where(
+        and(
+          eq(McpServerTable.userId, userId),
+          eq(McpServerTable.category, oldName),
+        ),
+      );
   },
 
   async deleteById(id) {
