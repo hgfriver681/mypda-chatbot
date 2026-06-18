@@ -42,5 +42,10 @@ process.env：
 
 - Memory（myPDA MCP 併入）、Files UI、聊天存進 Memory、search_memory 動畫等，
   詳見專案外部記憶筆記。
+- i18n：新增 `messages/zh-TW.json`（繁體中文，由 `messages/zh.json` 經 opencc
+  `s2twp` 轉換）。`SUPPORTED_LOCALES` 已移除所有國旗 emoji；平台預設語系
+  `DEFAULT_LOCALE = "zh-TW"`（見 `src/lib/const.ts`）。`getLocaleAction` 改為
+  cookie 優先、否則回 `DEFAULT_LOCALE`，**不再用瀏覽器 Accept-Language 自動偵測**，
+  讓預設語系確定是繁中。
 
 最後更新：2026-06-18

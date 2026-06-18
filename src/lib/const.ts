@@ -55,35 +55,42 @@ export const BASE_THEMES = [
 
 export const OAUTH_REQUIRED_CODE = "OAUTH_REQUIRED";
 
+// Platform default locale (used when the user has not explicitly chosen one).
+export const DEFAULT_LOCALE = "zh-TW";
+
+// Flag emojis intentionally removed (kept neutral). Names are plain text.
 export const SUPPORTED_LOCALES = [
   {
+    code: "zh-TW",
+    name: "繁體中文 (Traditional Chinese)",
+  },
+  {
     code: "en",
-    name: "English 🇺🇸",
+    name: "English",
   },
   {
     code: "ko",
-    name: "Korean 🇰🇷",
+    name: "Korean",
   },
-
   {
     code: "es",
-    name: "Spanish 🇪🇸",
+    name: "Spanish",
   },
   {
     code: "fr",
-    name: "French 🇫🇷",
+    name: "French",
   },
   {
     code: "ja",
-    name: "Japanese 🇯🇵",
+    name: "Japanese",
   },
   {
     code: "zh",
-    name: "Chinese 🇨🇳",
+    name: "简体中文 (Simplified Chinese)",
   },
   {
     code: "no",
-    name: "Norwegian 🇳🇴",
+    name: "Norwegian",
   },
 ];
 
