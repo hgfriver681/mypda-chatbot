@@ -115,9 +115,9 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
   });
 
   // Idle light-rays/particles disabled per docs/DISABLED_FEATURES.md
-  // (UI_FLAGS.idleParticles). When off, particles never show.
+  // (UI_FLAGS.ambientAnimations). When off, particles never show.
   const [showParticles, setShowParticles] = useState<boolean>(
-    UI_FLAGS.idleParticles && isFirstTime,
+    UI_FLAGS.ambientAnimations && isFirstTime,
   );
 
   const onFinish = useCallback(() => {
@@ -328,7 +328,7 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
 
   const handleFocus = useCallback(() => {
     setShowParticles(false);
-    if (UI_FLAGS.idleParticles) {
+    if (UI_FLAGS.ambientAnimations) {
       debounce(() => setShowParticles(true), 60000);
     }
   }, []);

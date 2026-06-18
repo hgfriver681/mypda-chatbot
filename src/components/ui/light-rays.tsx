@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState, useMemo } from "react";
 import { Renderer, Program, Triangle, Mesh } from "ogl";
 import { useTheme } from "next-themes";
+import { UI_FLAGS } from "lib/ui-flags";
 
 export type RaysOrigin =
   | "top-center"
@@ -478,6 +479,11 @@ void main() {
       return () => window.removeEventListener("mousemove", handleMouseMove);
     }
   }, [followMouse]);
+
+  // Ambient animation disabled platform-wide per docs/DISABLED_FEATURES.md
+  // (UI_FLAGS.ambientAnimations). Returns null after all hooks, so hook order
+  // is unaffected and the WebGL effects above no-op (container ref never set).
+  if (!UI_FLAGS.ambientAnimations) return null;
 
   return (
     <div

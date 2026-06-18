@@ -24,9 +24,9 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 | 3 | Sidebar「智能體 / Agents」list + 「創建智能體 / Create an agent」card + Tools-dropdown 智慧體 submenu | `<AppSidebarAgents/>` in `app-sidebar.tsx`, and `<AgentSelector/>` in `tool-select-dropdown.tsx` | `agents` | hidden (2026-06-18) |
 | 4 | User menu「報告問題 / Report an issue」 | `src/components/layouts/app-sidebar-user.tsx` — the `reportAnIssue` dropdown item (opens GitHub issues) | `reportIssue` | hidden (2026-06-18) |
 | 5 | User menu「加入社區 / Join community」 | `src/components/layouts/app-sidebar-user.tsx` — the `joinCommunity` dropdown item (opens Discord) | `joinCommunity` | hidden (2026-06-18) |
-| 6 | Header「切換語音聊天 / Toggle voice chat」 | `src/components/layouts/app-header.tsx` — the top-right `AudioWaveformIcon` button | `voiceChat` | hidden (2026-06-18) |
+| 6 | 語音聊天 / Voice chat (header button + chat-input button) | `app-header.tsx` (top-right `AudioWaveformIcon`) and `prompt-input.tsx` (input `AudioWaveformIcon`, tooltip 語音聊天模式) | `voiceChat` | hidden (2026-06-18) |
 | 7 | Header「切換臨時聊天 / Toggle temporary chat」 | `src/components/layouts/app-header.tsx` — the top-right `MessageCircleDashed` button | `temporaryChat` | hidden (2026-06-18) |
-| 8 | Chat idle animation (light rays + particles) | `src/components/chat-bot.tsx` — `showParticles` (shown after ~60s idle) gating `<LightRays/>` + `<Particles/>` | `idleParticles` | hidden (2026-06-18) |
+| 8 | Ambient light-rays / particles animations (platform-wide) | Gated at the components `src/components/ui/light-rays.tsx` + `src/components/ui/particles.tsx` (return null). Covers chat idle effect, /mcp dashboard, archive page, auth-error page, export preview | `ambientAnimations` | hidden (2026-06-18) |
 | 9 | Tools dropdown「生成圖片 / Generate image」submenu | `src/components/tool-select-dropdown.tsx` — `<ImageGeneratorSelector/>` | `imageGeneration` | hidden (2026-06-18) |
 | 10 | Tools dropdown「預設 / Presets」submenu | `src/components/tool-select-dropdown.tsx` — `<ToolPresets/>` | `toolPresets` | hidden (2026-06-18) |
 | 11 | Tools dropdown「網頁搜尋 / Web search」toggle | `src/components/tool-select-dropdown.tsx` — `AppDefaultToolKitSelector` (WebSearch toolkit) | `webSearch` | hidden (2026-06-18) |
@@ -44,13 +44,16 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 4. **Report an issue** — links to the upstream GitHub issues page; not relevant
    for this private deployment.
 5. **Join community** — links to the upstream Discord; not relevant here.
-6. **Toggle voice chat** — top-right header button that opens the voice chat
-   panel. Hidden; the voice chat feature/store is otherwise untouched.
+6. **Voice chat** — both entry points are hidden: the top-right header button
+   and the voice button inside the chat input (tooltip 語音聊天模式). The voice
+   chat feature/store is otherwise untouched.
 7. **Toggle temporary chat** — top-right header button that toggles temporary
    (non-persisted) chat mode. Hidden; the feature itself is untouched.
-8. **Chat idle animation** — after ~60s of inactivity the chat showed a
-   light-rays + particles effect (cleared on the next focus/activity). Disabled
-   so particles never appear; the LightRays/Particles components are untouched.
+8. **Ambient animations (platform-wide)** — the `LightRays` and `Particles`
+   WebGL effects (the "flickering light" seen in the chat idle state, on the
+   /mcp dashboard, the archive page, the auth-error page and the export
+   preview). Both components now return `null` when the flag is off, so every
+   usage — current or future — is covered in one place.
 
 ## Important
 

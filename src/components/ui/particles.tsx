@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { Renderer, Camera, Geometry, Program, Mesh } from "ogl";
 import { useTheme } from "next-themes";
+import { UI_FLAGS } from "lib/ui-flags";
 
 interface ParticlesProps {
   particleCount?: number;
@@ -277,6 +278,11 @@ const Particles: React.FC<ParticlesProps> = ({
     disableRotation,
     theme,
   ]);
+
+  // Ambient animation disabled platform-wide per docs/DISABLED_FEATURES.md
+  // (UI_FLAGS.ambientAnimations). Returns null after all hooks (hook order
+  // intact); the WebGL effect above no-ops because the container ref is unset.
+  if (!UI_FLAGS.ambientAnimations) return null;
 
   return (
     <div ref={containerRef} className={`relative w-full h-full ${className}`} />

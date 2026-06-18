@@ -34,9 +34,9 @@ process.env：
 3. Sidebar「智能體 / Agents」列表 + 「創建智能體 / Create an agent」卡片
 4. User menu「報告問題 / Report an issue」
 5. User menu「加入社區 / Join community」
-6. Header「切換語音聊天 / Toggle voice chat」
+6. 語音聊天 / Voice chat（header 按鈕 + 聊天輸入框按鈕）
 7. Header「切換臨時聊天 / Toggle temporary chat」
-8. 聊天閒置動畫（light rays + particles，閒置約 60 秒後出現）
+8. 全平台 ambient 動畫（light rays + particles；在 LightRays/Particles 元件本身關閉，涵蓋聊天閒置、/mcp、archive、auth-error、export 預覽）
 9. Tools 下拉選單：工作流、智慧體（沿用 1、3 的旗標）、生成圖片、預設、網頁搜尋、Code Execution
 
 > 未來要復原某項功能或變動 UI 時，先讀 `docs/DISABLED_FEATURES.md` 確認它是被

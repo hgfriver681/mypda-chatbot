@@ -51,6 +51,7 @@ import { cn } from "@/lib/utils";
 import { useThreadFileUploader } from "@/hooks/use-thread-file-uploader";
 
 import { EMOJI_DATA } from "lib/const";
+import { UI_FLAGS } from "lib/ui-flags";
 import { AgentSummary } from "app-types/agent";
 import { FileUIPart, TextUIPart } from "ai";
 import { toast } from "sonner";
@@ -615,7 +616,11 @@ export default function PromptInput({
                     <ChevronDown className="size-3" />
                   </Button>
                 </SelectModel>
-                {!isLoading && !input.length && !voiceDisabled ? (
+                {/* Voice chat hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.voiceChat) */}
+                {UI_FLAGS.voiceChat &&
+                !isLoading &&
+                !input.length &&
+                !voiceDisabled ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button

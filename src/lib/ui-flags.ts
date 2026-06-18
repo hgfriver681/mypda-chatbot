@@ -16,8 +16,11 @@ export const UI_FLAGS = {
   voiceChat: false,
   // Header「切換臨時聊天 / Toggle temporary chat」button
   temporaryChat: false,
-  // Chat idle animation (light rays + particles after ~60s of inactivity)
-  idleParticles: false,
+  // All ambient light-rays / particles animations platform-wide (chat idle
+  // effect, /mcp dashboard, archive page, auth-error page, export preview).
+  // Gated at the LightRays/Particles components themselves, so every usage is
+  // covered. false = no ambient animation anywhere.
+  ambientAnimations: false,
   // Tools dropdown「生成圖片 / Generate image」submenu
   imageGeneration: false,
   // Tools dropdown「預設 / Presets」submenu
