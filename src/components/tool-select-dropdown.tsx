@@ -64,6 +64,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "ui/avatar";
 import { WorkflowSummary } from "app-types/workflow";
 import { WorkflowGreeting } from "./workflow/workflow-greeting";
 import { AppDefaultToolkit } from "lib/ai/tools";
+import { UI_FLAGS } from "lib/ui-flags";
 import { ChatMention } from "app-types/chat";
 import { CountAnimation } from "ui/count-animation";
 
@@ -246,26 +247,46 @@ export function ToolSelectDropdown({
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="md:w-72" align={align} side={side}>
-        <WorkflowToolSelector onSelectWorkflow={onSelectWorkflow} />
-        <div className="py-1">
-          <DropdownMenuSeparator />
-        </div>
-        <AgentSelector onSelectAgent={onSelectAgent} />
-        <div className="py-1">
-          <DropdownMenuSeparator />
-        </div>
-        <ImageGeneratorSelector
-          onGenerateImage={onGenerateImage}
-          modelInfo={modelInfo}
-        />
-        <div className="py-1">
-          <DropdownMenuSeparator />
-        </div>
+        {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.workflow) */}
+        {UI_FLAGS.workflow && (
+          <>
+            <WorkflowToolSelector onSelectWorkflow={onSelectWorkflow} />
+            <div className="py-1">
+              <DropdownMenuSeparator />
+            </div>
+          </>
+        )}
+        {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.agents) */}
+        {UI_FLAGS.agents && (
+          <>
+            <AgentSelector onSelectAgent={onSelectAgent} />
+            <div className="py-1">
+              <DropdownMenuSeparator />
+            </div>
+          </>
+        )}
+        {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.imageGeneration) */}
+        {UI_FLAGS.imageGeneration && (
+          <>
+            <ImageGeneratorSelector
+              onGenerateImage={onGenerateImage}
+              modelInfo={modelInfo}
+            />
+            <div className="py-1">
+              <DropdownMenuSeparator />
+            </div>
+          </>
+        )}
         <div className="py-2">
-          <ToolPresets />
-          <div className="py-1">
-            <DropdownMenuSeparator />
-          </div>
+          {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.toolPresets) */}
+          {UI_FLAGS.toolPresets && (
+            <>
+              <ToolPresets />
+              <div className="py-1">
+                <DropdownMenuSeparator />
+              </div>
+            </>
+          )}
           <AppDefaultToolKitSelector />
           <div className="py-1">
             <DropdownMenuSeparator />
@@ -870,7 +891,14 @@ function AppDefaultToolKitSelector() {
 
   const defaultToolInfo = useMemo(() => {
     const raw = t.raw("Chat.Tool.defaultToolKit");
-    return Object.values(AppDefaultToolkit).map((toolkit) => {
+    return Object.values(AppDefaultToolkit)
+      // Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.webSearch / codeExecution)
+      .filter((toolkit) => {
+        if (toolkit === AppDefaultToolkit.WebSearch) return UI_FLAGS.webSearch;
+        if (toolkit === AppDefaultToolkit.Code) return UI_FLAGS.codeExecution;
+        return true;
+      })
+      .map((toolkit) => {
       const label = raw[toolkit] || toolkit;
       const id = toolkit;
       let icon = Wrench;

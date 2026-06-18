@@ -18,4 +18,12 @@ export const UI_FLAGS = {
   temporaryChat: false,
   // Chat idle animation (light rays + particles after ~60s of inactivity)
   idleParticles: false,
+  // Tools dropdown「生成圖片 / Generate image」submenu
+  imageGeneration: false,
+  // Tools dropdown「預設 / Presets」submenu
+  toolPresets: false,
+  // Tools dropdown「網頁搜尋 / Web search」toggle
+  webSearch: false,
+  // Tools dropdown「Code Execution」toggle
+  codeExecution: false,
 } as const;

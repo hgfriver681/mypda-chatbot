@@ -19,14 +19,18 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 
 | # | Feature | Where it renders | Flag | Status |
 |---|---------|------------------|------|--------|
-| 1 | Sidebar「工作流 / Workflow」link | `src/components/layouts/app-sidebar-menus.tsx` — the `<SidebarMenu>` wrapping `<Link href="/workflow">` (`t("Layout.workflow")`) | `workflow` | hidden (2026-06-18) |
+| 1 | Sidebar「工作流 / Workflow」link + Tools-dropdown 工作流 submenu | `app-sidebar-menus.tsx` (`<Link href="/workflow">`) and `tool-select-dropdown.tsx` (`<WorkflowToolSelector/>`) | `workflow` | hidden (2026-06-18) |
 | 2 | Sidebar「封存 / 归档 / Archive」section | `src/components/layouts/app-sidebar-menus.tsx` — the `<SidebarMenu className="group/archive">` block (`t("Archive.title")`) and its `<ArchiveDialog>` | `archive` | hidden (2026-06-18) |
-| 3 | Sidebar「智能體 / Agents」list + 「創建智能體 / Create an agent」card | the whole `<AppSidebarAgents/>` component, mounted in `src/components/layouts/app-sidebar.tsx` (`<AppSidebarAgents userRole={userRole} />`) | `agents` | hidden (2026-06-18) |
+| 3 | Sidebar「智能體 / Agents」list + 「創建智能體 / Create an agent」card + Tools-dropdown 智慧體 submenu | `<AppSidebarAgents/>` in `app-sidebar.tsx`, and `<AgentSelector/>` in `tool-select-dropdown.tsx` | `agents` | hidden (2026-06-18) |
 | 4 | User menu「報告問題 / Report an issue」 | `src/components/layouts/app-sidebar-user.tsx` — the `reportAnIssue` dropdown item (opens GitHub issues) | `reportIssue` | hidden (2026-06-18) |
 | 5 | User menu「加入社區 / Join community」 | `src/components/layouts/app-sidebar-user.tsx` — the `joinCommunity` dropdown item (opens Discord) | `joinCommunity` | hidden (2026-06-18) |
 | 6 | Header「切換語音聊天 / Toggle voice chat」 | `src/components/layouts/app-header.tsx` — the top-right `AudioWaveformIcon` button | `voiceChat` | hidden (2026-06-18) |
 | 7 | Header「切換臨時聊天 / Toggle temporary chat」 | `src/components/layouts/app-header.tsx` — the top-right `MessageCircleDashed` button | `temporaryChat` | hidden (2026-06-18) |
 | 8 | Chat idle animation (light rays + particles) | `src/components/chat-bot.tsx` — `showParticles` (shown after ~60s idle) gating `<LightRays/>` + `<Particles/>` | `idleParticles` | hidden (2026-06-18) |
+| 9 | Tools dropdown「生成圖片 / Generate image」submenu | `src/components/tool-select-dropdown.tsx` — `<ImageGeneratorSelector/>` | `imageGeneration` | hidden (2026-06-18) |
+| 10 | Tools dropdown「預設 / Presets」submenu | `src/components/tool-select-dropdown.tsx` — `<ToolPresets/>` | `toolPresets` | hidden (2026-06-18) |
+| 11 | Tools dropdown「網頁搜尋 / Web search」toggle | `src/components/tool-select-dropdown.tsx` — `AppDefaultToolKitSelector` (WebSearch toolkit) | `webSearch` | hidden (2026-06-18) |
+| 12 | Tools dropdown「Code Execution」toggle | `src/components/tool-select-dropdown.tsx` — `AppDefaultToolKitSelector` (Code toolkit) | `codeExecution` | hidden (2026-06-18) |
 
 ## Details & restore notes
 
@@ -50,6 +54,10 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 
 ## Important
 
+- Items 9–12 hide entries in the chat **Tools dropdown** only. For the toggles
+  (web search / code execution) this removes the switch from the UI but does not
+  forcibly clear whatever is already in `allowedAppDefaultToolkit` — it is a
+  UI-visibility change, consistent with the rest of this list.
 - These are **UI-only** hides. Backend routes and APIs are untouched, so the
   features still work if a URL is visited directly. Only the entry points are
   hidden.
