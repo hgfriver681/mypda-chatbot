@@ -34,6 +34,8 @@ process.env：
 3. Sidebar「智能體 / Agents」列表 + 「創建智能體 / Create an agent」卡片
 4. User menu「報告問題 / Report an issue」
 5. User menu「加入社區 / Join community」
+6. Header「切換語音聊天 / Toggle voice chat」
+7. Header「切換臨時聊天 / Toggle temporary chat」
 
 > 未來要復原某項功能或變動 UI 時，先讀 `docs/DISABLED_FEATURES.md` 確認它是被
 > 「刻意隱藏」而非不存在；改動後務必同步更新該檔與旗標的 status。

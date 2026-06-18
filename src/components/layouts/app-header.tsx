@@ -22,6 +22,7 @@ import { TextShimmer } from "ui/text-shimmer";
 import { buildReturnUrl } from "lib/admin/navigation-utils";
 import { BackButton } from "@/components/layouts/back-button";
 import { SaveSessionButton } from "@/components/memory/save-session-button";
+import { UI_FLAGS } from "lib/ui-flags";
 
 export function AppHeader() {
   const t = useTranslations();
@@ -98,78 +99,86 @@ export function AppHeader() {
       {showActionButtons && (
         <div className="flex items-center gap-2">
           <SaveSessionButton />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size={"icon"}
-                variant={"ghost"}
-                className="bg-secondary/40"
-                onClick={() => {
-                  appStoreMutate((state) => ({
-                    voiceChat: {
-                      ...state.voiceChat,
-                      isOpen: true,
-                      agentId: undefined,
-                    },
-                  }));
-                }}
-              >
-                <AudioWaveformIcon className="size-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent align="end" side="bottom">
-              <div className="text-xs flex items-center gap-2">
-                {t("KeyboardShortcuts.toggleVoiceChat")}
-                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  {getShortcutKeyList(Shortcuts.toggleVoiceChat).map((key) => (
-                    <span
-                      className="w-5 h-5 flex items-center justify-center bg-muted rounded "
-                      key={key}
-                    >
-                      {key}
-                    </span>
-                  ))}
+          {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.voiceChat) */}
+          {UI_FLAGS.voiceChat && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size={"icon"}
+                  variant={"ghost"}
+                  className="bg-secondary/40"
+                  onClick={() => {
+                    appStoreMutate((state) => ({
+                      voiceChat: {
+                        ...state.voiceChat,
+                        isOpen: true,
+                        agentId: undefined,
+                      },
+                    }));
+                  }}
+                >
+                  <AudioWaveformIcon className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent align="end" side="bottom">
+                <div className="text-xs flex items-center gap-2">
+                  {t("KeyboardShortcuts.toggleVoiceChat")}
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    {getShortcutKeyList(Shortcuts.toggleVoiceChat).map(
+                      (key) => (
+                        <span
+                          className="w-5 h-5 flex items-center justify-center bg-muted rounded "
+                          key={key}
+                        >
+                          {key}
+                        </span>
+                      ),
+                    )}
+                  </div>
                 </div>
-              </div>
-            </TooltipContent>
-          </Tooltip>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size={"icon"}
-                variant={"secondary"}
-                className="bg-secondary/40"
-                onClick={() => {
-                  appStoreMutate((state) => ({
-                    temporaryChat: {
-                      ...state.temporaryChat,
-                      isOpen: !state.temporaryChat.isOpen,
-                    },
-                  }));
-                }}
-              >
-                <MessageCircleDashed className="size-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent align="end" side="bottom">
-              <div className="text-xs flex items-center gap-2">
-                {t("KeyboardShortcuts.toggleTemporaryChat")}
-                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  {getShortcutKeyList(Shortcuts.toggleTemporaryChat).map(
-                    (key) => (
-                      <span
-                        className="w-5 h-5 flex items-center justify-center bg-muted rounded "
-                        key={key}
-                      >
-                        {key}
-                      </span>
-                    ),
-                  )}
+          {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.temporaryChat) */}
+          {UI_FLAGS.temporaryChat && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size={"icon"}
+                  variant={"secondary"}
+                  className="bg-secondary/40"
+                  onClick={() => {
+                    appStoreMutate((state) => ({
+                      temporaryChat: {
+                        ...state.temporaryChat,
+                        isOpen: !state.temporaryChat.isOpen,
+                      },
+                    }));
+                  }}
+                >
+                  <MessageCircleDashed className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent align="end" side="bottom">
+                <div className="text-xs flex items-center gap-2">
+                  {t("KeyboardShortcuts.toggleTemporaryChat")}
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    {getShortcutKeyList(Shortcuts.toggleTemporaryChat).map(
+                      (key) => (
+                        <span
+                          className="w-5 h-5 flex items-center justify-center bg-muted rounded "
+                          key={key}
+                        >
+                          {key}
+                        </span>
+                      ),
+                    )}
+                  </div>
                 </div>
-              </div>
-            </TooltipContent>
-          </Tooltip>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       )}
     </header>

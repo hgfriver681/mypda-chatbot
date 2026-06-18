@@ -12,4 +12,8 @@ export const UI_FLAGS = {
   reportIssue: false,
   // User menu「加入社區 / Join community」
   joinCommunity: false,
+  // Header「切換語音聊天 / Toggle voice chat」button
+  voiceChat: false,
+  // Header「切換臨時聊天 / Toggle temporary chat」button
+  temporaryChat: false,
 } as const;

@@ -24,6 +24,8 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 | 3 | Sidebar「智能體 / Agents」list + 「創建智能體 / Create an agent」card | the whole `<AppSidebarAgents/>` component, mounted in `src/components/layouts/app-sidebar.tsx` (`<AppSidebarAgents userRole={userRole} />`) | `agents` | hidden (2026-06-18) |
 | 4 | User menu「報告問題 / Report an issue」 | `src/components/layouts/app-sidebar-user.tsx` — the `reportAnIssue` dropdown item (opens GitHub issues) | `reportIssue` | hidden (2026-06-18) |
 | 5 | User menu「加入社區 / Join community」 | `src/components/layouts/app-sidebar-user.tsx` — the `joinCommunity` dropdown item (opens Discord) | `joinCommunity` | hidden (2026-06-18) |
+| 6 | Header「切換語音聊天 / Toggle voice chat」 | `src/components/layouts/app-header.tsx` — the top-right `AudioWaveformIcon` button | `voiceChat` | hidden (2026-06-18) |
+| 7 | Header「切換臨時聊天 / Toggle temporary chat」 | `src/components/layouts/app-header.tsx` — the top-right `MessageCircleDashed` button | `temporaryChat` | hidden (2026-06-18) |
 
 ## Details & restore notes
 
@@ -37,6 +39,10 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 4. **Report an issue** — links to the upstream GitHub issues page; not relevant
    for this private deployment.
 5. **Join community** — links to the upstream Discord; not relevant here.
+6. **Toggle voice chat** — top-right header button that opens the voice chat
+   panel. Hidden; the voice chat feature/store is otherwise untouched.
+7. **Toggle temporary chat** — top-right header button that toggles temporary
+   (non-persisted) chat mode. Hidden; the feature itself is untouched.
 
 ## Important
 
