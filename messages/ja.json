@@ -253,7 +253,8 @@
     "joinCommunity": "コミュニティに参加",
     "workflow": "ワークフロー",
     "userSettings": "ユーザー設定",
-    "mcpServers": "MCP サーバー"
+    "mcpServers": "MCP サーバー",
+    "more": "その他"
   },
   "Archive": {
     "title": "アーカイブ",

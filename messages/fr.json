@@ -253,7 +253,8 @@
     "joinCommunity": "Rejoindre la Communauté",
     "workflow": "Flux de Travail",
     "userSettings": "Paramètres Utilisateur",
-    "mcpServers": "Serveurs MCP"
+    "mcpServers": "Serveurs MCP",
+    "more": "Plus"
   },
   "Archive": {
     "title": "Archive",

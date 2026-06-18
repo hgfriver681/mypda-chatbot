@@ -46,12 +46,15 @@ process.env：
 
 - Memory（myPDA MCP 併入）、Files UI、聊天存進 Memory、search_memory 動畫等，
   詳見專案外部記憶筆記。
-- Sidebar 結構（Plan B：以 MCP server 為主軸 + 使用者可編輯分組 + 收合）：
-  - `src/components/layouts/app-sidebar-mcp.tsx`：頂層只有「新聊天 / MCP 伺服器 / Admin」；
-    其餘一律是 MCP server 的面板。server 依使用者自訂 `category` 分組（單層、自由命名，
-    `未分組` 排最後），**群組可收合、server 也可收合**。`SERVER_PANELS`（依 server name）
-    把 Files 掛在 `datapilot-pdf`、Memories/Requests/API Keys 掛在 `mypda-memory`；
-    沒有面板的 server 直接連到 `/mcp/test/<id>`。（舊的 `app-sidebar-memory.tsx` 已移除。）
+- Sidebar 結構（以 MCP server 為主軸 + 使用者可編輯分組，**扁平、ChatGPT 式、不收合**）：
+  - `src/components/layouts/app-sidebar-mcp.tsx`：頂層「新聊天 / MCP 伺服器」；其餘是 MCP
+    server 的面板，依使用者自訂 `category` 分組（單層、自由命名，`未分組` 排最後）。
+    **無展開/收合**：分類是安靜的小灰字標籤（純 `<div>`，hover 不反底、不可點）；
+    server/面板是扁平的整列可點項（`SidebarMenuButton`，hover 反底）。有面板的 server
+    直接列出面板（Files→`datapilot-pdf`、Memories→`mypda-memory`，見 `SERVER_PANELS`）；
+    沒面板的 server 列出自身、連到 `/mcp/test/<id>`。（舊的 `app-sidebar-memory.tsx` 已移除。）
+  - 溢出：Admin 收進 ChatGPT 式「⋯ 更多」flyout（`app-sidebar-menus.tsx` 的 DropdownMenu，
+    `side="right"`，i18n `Layout.more`）；未來低頻項目也放這。`app-sidebar-menu-admin.tsx` 已不再使用。
   - 分組資料：`mcp_server` 新增 `category text`（nullable，migration `0017_*`，已 push
     Supabase）。型別見 `app-types/mcp`（MCPServerInfo/Select/Insert 的 `category`）。
     **`save()` 不碰 category**；改用 `updateMcpCategoryAction` / `mcpRepository.updateCategory`

@@ -1,24 +1,17 @@
 "use client";
 import { useMcpList } from "@/hooks/queries/use-mcp-list";
 import type { MCPServerInfo } from "app-types/mcp";
-import { cn } from "lib/utils";
-import { BrainIcon, ChevronRight, FolderIcon, ServerIcon } from "lucide-react";
+import { BrainIcon, FolderIcon, ServerIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { MCPIcon } from "ui/mcp-icon";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from "ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "ui/sidebar";
 
-// Custom feature panels mounted under a specific MCP server (matched by name).
-// A server without an entry here is just a link to its tool-test page.
+// Feature panels mounted under a specific MCP server (matched by name). A server
+// with panels shows those panels as its sidebar items; a server without panels
+// shows its own name (links to its tool-test page).
 type Panel = {
   key: string;
   label: string;
@@ -29,7 +22,7 @@ const SERVER_PANELS: Record<string, Panel[]> = {
   "datapilot-pdf": [
     { key: "files", label: "Files", href: "/files", icon: FolderIcon },
   ],
-  // Requests + API Keys are now tabs inside the single /memory page.
+  // Requests + API Keys are tabs inside the single /memory page.
   "mypda-memory": [
     { key: "memories", label: "Memories", href: "/memory", icon: BrainIcon },
   ],
@@ -37,6 +30,8 @@ const SERVER_PANELS: Record<string, Panel[]> = {
 
 const UNGROUPED = "__ungrouped__";
 
+// Flat, ChatGPT-style: no expand/collapse. Categories are quiet text labels;
+// every server/panel is a flat, full-row-highlight clickable item.
 export function AppSidebarMcp() {
   const t = useTranslations();
   const pathname = usePathname();
@@ -58,14 +53,6 @@ export function AppSidebarMcp() {
     });
   }, [mcpList]);
 
-  // Is the current route one of a server's feature panels?
-  const serverHasActivePanel = (name: string) =>
-    (SERVER_PANELS[name] ?? []).some((p) => pathname === p.href);
-
-  // null = follow default (open when active); boolean = explicit user toggle.
-  const [groupOpen, setGroupOpen] = useState<Record<string, boolean>>({});
-  const [serverOpen, setServerOpen] = useState<Record<string, boolean>>({});
-
   return (
     <>
       <SidebarMenu>
@@ -82,114 +69,46 @@ export function AppSidebarMcp() {
         </SidebarMenuItem>
       </SidebarMenu>
 
-      {groups.map(([groupKey, servers]) => {
-        const isGroupOpen = groupOpen[groupKey] ?? true;
-        const label = groupKey === UNGROUPED ? t("MCP.ungrouped") : groupKey;
-        return (
-          <SidebarMenu key={groupKey} className="mt-1">
-            <SidebarMenuItem>
-              {/* Category label, not a nav item: small + muted, and (unlike the
-                  clickable rows) it does NOT fill the whole row on hover. It only
-                  collapses/expands its group — mirrors Claude's section headers. */}
-              <button
-                type="button"
-                aria-expanded={isGroupOpen}
-                onClick={() =>
-                  setGroupOpen((prev) => ({
-                    ...prev,
-                    [groupKey]: !isGroupOpen,
-                  }))
-                }
-                className="flex w-full items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground/80 transition-colors hover:text-foreground"
-              >
-                <ChevronRight
-                  className={cn(
-                    "size-3 shrink-0 transition-transform",
-                    isGroupOpen && "rotate-90",
-                  )}
-                />
-                <span className="truncate">{label}</span>
-                <span className="ml-auto text-[10px] tabular-nums opacity-60">
-                  {servers.length}
-                </span>
-              </button>
-            </SidebarMenuItem>
-
-            {isGroupOpen && (
-              <SidebarMenuSub>
-                {servers.map((server) => {
-                  const panels = SERVER_PANELS[server.name];
-                  // Server without custom panels: a plain link to its test page.
-                  if (!panels) {
-                    return (
-                      <SidebarMenuSubItem key={server.id}>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={pathname === `/mcp/test/${server.id}`}
-                        >
-                          <Link href={`/mcp/test/${server.id}`}>
-                            <ServerIcon className="size-4" />
-                            <span className="truncate">{server.name}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    );
-                  }
-                  // Server with custom panels: collapsible, panels nested under it.
-                  const isOpen =
-                    serverOpen[server.id] ?? serverHasActivePanel(server.name);
-                  return (
-                    <div key={server.id}>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          onClick={() =>
-                            setServerOpen((prev) => ({
-                              ...prev,
-                              [server.id]: !isOpen,
-                            }))
-                          }
-                          className="cursor-pointer"
-                        >
-                          <ChevronRight
-                            className={cn(
-                              "size-3.5 transition-transform",
-                              isOpen && "rotate-90",
-                            )}
-                          />
-                          <ServerIcon className="size-4" />
-                          <span className="truncate">{server.name}</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      {isOpen &&
-                        panels.map((panel) => {
-                          const Icon = panel.icon;
-                          return (
-                            <SidebarMenuSubItem
-                              key={panel.key}
-                              className="ml-3"
-                            >
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={pathname === panel.href}
-                              >
-                                <Link href={panel.href}>
-                                  <Icon className="size-4" />
-                                  <span className="truncate">
-                                    {panel.label}
-                                  </span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          );
-                        })}
-                    </div>
-                  );
-                })}
-              </SidebarMenuSub>
-            )}
-          </SidebarMenu>
-        );
-      })}
+      {groups.map(([groupKey, servers]) => (
+        <SidebarMenu key={groupKey} className="mt-2">
+          {/* Category label: a quiet, non-clickable text header (no hover fill,
+              no collapse) — mirrors ChatGPT's section labels. */}
+          <div className="select-none px-2 pb-0.5 pt-1 text-xs font-medium text-muted-foreground/70">
+            {groupKey === UNGROUPED ? t("MCP.ungrouped") : groupKey}
+          </div>
+          {servers.flatMap((server) => {
+            const panels = SERVER_PANELS[server.name];
+            // No custom panels: the server itself is the item (-> test page).
+            if (!panels) {
+              const href = `/mcp/test/${server.id}`;
+              return [
+                <SidebarMenuItem key={server.id}>
+                  <Link href={href}>
+                    <SidebarMenuButton isActive={pathname === href}>
+                      <ServerIcon className="size-4" />
+                      <span className="truncate">{server.name}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>,
+              ];
+            }
+            // Has panels: list each panel as a flat item.
+            return panels.map((panel) => {
+              const Icon = panel.icon;
+              return (
+                <SidebarMenuItem key={`${server.id}-${panel.key}`}>
+                  <Link href={panel.href}>
+                    <SidebarMenuButton isActive={pathname === panel.href}>
+                      <Icon className="size-4" />
+                      <span className="truncate">{panel.label}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              );
+            });
+          })}
+        </SidebarMenu>
+      ))}
     </>
   );
 }

@@ -1,5 +1,11 @@
 "use client";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "ui/dropdown-menu";
+import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuSub,
@@ -19,7 +25,9 @@ import { getIsUserAdmin } from "lib/user/utils";
 import {
   FolderOpenIcon,
   FolderSearchIcon,
+  MoreHorizontal,
   PlusIcon,
+  Shield,
   Waypoints,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -31,7 +39,6 @@ import { Skeleton } from "ui/skeleton";
 import { WriteIcon } from "ui/write-icon";
 import { ArchiveDialog } from "../archive-dialog";
 import { AppSidebarMcp } from "./app-sidebar-mcp";
-import { AppSidebarAdmin } from "./app-sidebar-menu-admin";
 
 export function AppSidebarMenus({ user }: { user?: BasicUser }) {
   const router = useRouter();
@@ -78,9 +85,8 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
             </SidebarMenuItem>
           </Tooltip>
         </SidebarMenu>
-        {/* Plan B: MCP servers grouped by user-defined category, collapsible.
-            Files / Memories / Requests / API Keys are server panels, not
-            top-level items. See app-sidebar-mcp.tsx. */}
+        {/* MCP servers, flat (no collapse) and grouped by user-defined category
+            labels. Files / Memories are server panels. See app-sidebar-mcp.tsx. */}
         <AppSidebarMcp />
         {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.workflow) */}
         {UI_FLAGS.workflow && (
@@ -97,7 +103,34 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
             </Tooltip>
           </SidebarMenu>
         )}
-        {getIsUserAdmin(user) && <AppSidebarAdmin />}
+        {/* Overflow menu (ChatGPT-style "More" flyout). Admin lives here now;
+            future low-traffic items go here too. */}
+        {getIsUserAdmin(user) && (
+          <SidebarMenu className="mt-2">
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton className="font-medium">
+                    <MoreHorizontal className="size-4" />
+                    {t("Layout.more")}
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="right"
+                  align="start"
+                  className="w-48"
+                >
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href="/admin" data-testid="admin-sidebar-link">
+                      <Shield className="mr-2 size-4" />
+                      {t("Admin.title")}
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
         {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.archive) */}
         {UI_FLAGS.archive && (
           <SidebarMenu className="group/archive">

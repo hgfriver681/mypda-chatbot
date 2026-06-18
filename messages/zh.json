@@ -254,7 +254,8 @@
     "joinCommunity": "加入社区",
     "workflow": "工作流",
     "userSettings": "用户设置",
-    "mcpServers": "MCP 服务器"
+    "mcpServers": "MCP 服务器",
+    "more": "更多"
   },
   "Archive": {
     "title": "归档",

@@ -19,6 +19,10 @@ export function MemoryTabs({
   const [tab, setTab] = useState<MemoryTab>(initialTab);
   return (
     <div className="mx-auto w-full max-w-4xl p-6">
+      <div className="mb-4 flex items-center gap-2">
+        <BrainIcon className="size-6" />
+        <h1 className="text-2xl font-bold">Memories</h1>
+      </div>
       <Tabs value={tab} onValueChange={(v) => setTab(v as MemoryTab)}>
         <TabsList>
           <TabsTrigger value="memories">
