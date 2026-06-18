@@ -71,8 +71,10 @@ process.env：
   「加到重播」→ `POST /api/replays`（快照該對話訊息 + `demo=true`）。讀取 `GET /api/replays`
   **不過濾 user_id** → 全帳號共享(這就是跨帳號的機制:同一個 DB、讀取放行)。
   - Sidebar「重播」區（`app-sidebar-replay.tsx`,所有帳號可見;admin 有 hover 刪除）。
-  - 重播檢視 `/replay/[id]`（`replay-player.tsx`):用真的 `PreviewMessage` 泡泡**逐則揭露 +
-    打字指示**播放,純前端、不呼叫 LLM(可複現)。只有 `demo=true` 的快照能從這條路由播。
+  - 重播檢視 `/replay/[id]`（`replay-player.tsx`):**靜態顯示**該快照的聊天紀錄(用真的
+    `PreviewMessage` 泡泡,唯讀;不呼叫 LLM、可複現)。原本有逐則揭露+打字動畫的「播放」,
+    依需求已移除(只要看紀錄)。只有 `demo=true` 的快照能從這條路由開。`Replay.play/pause/...`
+    i18n key 留著但目前未用。
   - repo:`chatExportRepository.selectDemos()`(全域)、`exportChat({demo})`。i18n:`Layout.replays`、
     `Chat.Thread.addToReplay/...`、`Replay.*`。權限:promote/delete 限 admin(`/api/replays` 內檢查)。
 - 列表分頁：`src/components/memory/list-pager.tsx`（`usePagination` hook + `ListPager`
