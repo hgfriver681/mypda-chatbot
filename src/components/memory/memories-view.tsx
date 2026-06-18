@@ -1,11 +1,13 @@
 "use client";
-import useSWR from "swr";
-import { useMemo, useState } from "react";
+import type { Memory, MemoryRange } from "app-types/memory";
+import { collectCategories, relativeTime } from "lib/memory/format";
 import { fetcher } from "lib/utils";
-import { Button } from "ui/button";
+import { BrainIcon, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Badge } from "ui/badge";
-import { Textarea } from "ui/textarea";
-import { Input } from "ui/input";
+import { Button } from "ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,11 +15,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "ui/dialog";
-import { toast } from "sonner";
-import { RefreshCw, Plus, Trash2, BrainIcon } from "lucide-react";
-import type { Memory, MemoryRange } from "app-types/memory";
-import { relativeTime, collectCategories } from "lib/memory/format";
-import { usePagination, ListPager } from "./list-pager";
+import { Input } from "ui/input";
+import { Textarea } from "ui/textarea";
+import { ListPager, usePagination } from "./list-pager";
 
 const RANGES: MemoryRange[] = ["all", "7d", "30d"];
 const RANGE_LABEL: Record<MemoryRange, string> = {
@@ -26,7 +26,9 @@ const RANGE_LABEL: Record<MemoryRange, string> = {
   "30d": "30d",
 };
 
-export function MemoriesView() {
+export function MemoriesView({
+  embedded = false,
+}: { embedded?: boolean } = {}) {
   const [range, setRange] = useState<MemoryRange>("all");
   const [category, setCategory] = useState<string | null>(null);
 
@@ -104,12 +106,16 @@ export function MemoriesView() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl p-6">
+    <div className={embedded ? "w-full" : "mx-auto w-full max-w-4xl p-6"}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <BrainIcon className="size-6" />
-          <h1 className="text-2xl font-bold">Memories</h1>
-        </div>
+        {embedded ? (
+          <div />
+        ) : (
+          <div className="flex items-center gap-2">
+            <BrainIcon className="size-6" />
+            <h1 className="text-2xl font-bold">Memories</h1>
+          </div>
+        )}
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => mutate()}>
             <RefreshCw className="size-4" /> Refresh

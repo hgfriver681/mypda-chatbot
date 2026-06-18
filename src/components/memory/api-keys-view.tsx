@@ -1,9 +1,12 @@
 "use client";
-import useSWR from "swr";
-import { useState } from "react";
+import type { ApiKey } from "app-types/memory";
+import { relativeTime } from "lib/memory/format";
 import { fetcher } from "lib/utils";
+import { Copy, KeyRoundIcon, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { Button } from "ui/button";
-import { Input } from "ui/input";
 import {
   Dialog,
   DialogContent,
@@ -12,12 +15,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "ui/dialog";
-import { toast } from "sonner";
-import { KeyRoundIcon, Plus, Copy, Trash2 } from "lucide-react";
-import type { ApiKey } from "app-types/memory";
-import { relativeTime } from "lib/memory/format";
+import { Input } from "ui/input";
 
-export function ApiKeysView() {
+export function ApiKeysView({ embedded = false }: { embedded?: boolean } = {}) {
   const { data, isLoading, mutate } = useSWR<{ keys: ApiKey[] }>(
     `/api/memory/keys`,
     fetcher,
@@ -60,13 +60,16 @@ export function ApiKeysView() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl p-6">
-      <div className="flex items-center gap-2">
-        <KeyRoundIcon className="size-6" />
-        <h1 className="text-2xl font-bold">API Keys</h1>
-      </div>
+    <div className={embedded ? "w-full" : "mx-auto w-full max-w-4xl p-6"}>
+      {!embedded && (
+        <div className="flex items-center gap-2">
+          <KeyRoundIcon className="size-6" />
+          <h1 className="text-2xl font-bold">API Keys</h1>
+        </div>
+      )}
       <p className="mt-1 text-sm text-muted-foreground">
-        Keys let an MCP client (e.g. a chat agent) reach your memory. Shown once.
+        Keys let an MCP client (e.g. a chat agent) reach your memory. Shown
+        once.
       </p>
 
       <div className="mt-4 flex gap-2">

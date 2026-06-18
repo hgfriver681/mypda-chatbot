@@ -1,8 +1,10 @@
 "use client";
-import useSWR from "swr";
+import type { MemoryInvocation } from "app-types/memory";
+import { relativeTime } from "lib/memory/format";
 import { fetcher } from "lib/utils";
-import { Badge } from "ui/badge";
 import { ActivityIcon } from "lucide-react";
+import useSWR from "swr";
+import { Badge } from "ui/badge";
 import {
   Table,
   TableBody,
@@ -11,14 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "ui/table";
-import type { MemoryInvocation } from "app-types/memory";
-import { relativeTime } from "lib/memory/format";
-import { usePagination, ListPager } from "./list-pager";
+import { ListPager, usePagination } from "./list-pager";
 
 // Requests = live MCP invocation log. We poll every 5s rather than use Supabase
 // Realtime, because Better Auth (not Supabase Auth) is the identity, so the
 // browser has no Supabase JWT for RLS-scoped realtime. (See MERGE plan.)
-export function RequestsView() {
+export function RequestsView({
+  embedded = false,
+}: { embedded?: boolean } = {}) {
   const { data, isLoading } = useSWR<{ invocations: MemoryInvocation[] }>(
     `/api/memory/invocations`,
     fetcher,
@@ -37,11 +39,13 @@ export function RequestsView() {
   } = usePagination(rows, 25);
 
   return (
-    <div className="mx-auto w-full max-w-4xl p-6">
-      <div className="flex items-center gap-2">
-        <ActivityIcon className="size-6" />
-        <h1 className="text-2xl font-bold">Requests</h1>
-      </div>
+    <div className={embedded ? "w-full" : "mx-auto w-full max-w-4xl p-6"}>
+      {!embedded && (
+        <div className="flex items-center gap-2">
+          <ActivityIcon className="size-6" />
+          <h1 className="text-2xl font-bold">Requests</h1>
+        </div>
+      )}
       <p className="mt-1 text-sm text-muted-foreground">
         Live MCP tool calls against your memory (auto-refresh).
       </p>

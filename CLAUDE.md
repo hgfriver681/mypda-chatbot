@@ -59,6 +59,10 @@ process.env：
   - 編輯入口：每張 MCP 卡片名稱旁的「群組」按鈕（`mcp-card.tsx` 的 `CategoryEditor`，
     popover + datalist 建議現有群組，owner 限定）。i18n：`MCP.group/ungrouped/groupPlaceholder`、
     `Layout.mcpServers`。
+- Memory 頁合併：`/memory` 改為**單一頁 + 分頁**（`memory-tabs.tsx`：Memories 預設、
+  Requests/API Keys 為次要分頁，各 view 加 `embedded` prop 隱藏大標題/外層 padding 但保留控制鈕）。
+  `/memory/requests`、`/memory/keys` 改為 `redirect` 到 `/memory?tab=requests|keys`（舊連結仍可用）。
+  因此 sidebar 的 `mypda-memory` 只剩單一 `Memories` 面板。
 - 列表分頁：`src/components/memory/list-pager.tsx`（`usePagination` hook + `ListPager`
   元件，client-side 切片，每頁 10/25/50/100 可選），用於 Memories 與 Requests；
   筆數 ≤10 時自動隱藏分頁列。

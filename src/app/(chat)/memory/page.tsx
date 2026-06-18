@@ -1,11 +1,21 @@
+import { type MemoryTab, MemoryTabs } from "@/components/memory/memory-tabs";
 import { getSession } from "auth/server";
 import { redirect } from "next/navigation";
-import { MemoriesView } from "@/components/memory/memories-view";
 
 export const dynamic = "force-dynamic";
 
-export default async function Page() {
+const VALID_TABS = ["memories", "requests", "keys"];
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const session = await getSession();
   if (!session?.user) return redirect("/login");
-  return <MemoriesView />;
+  const { tab } = await searchParams;
+  const initialTab: MemoryTab = VALID_TABS.includes(tab ?? "")
+    ? (tab as MemoryTab)
+    : "memories";
+  return <MemoryTabs initialTab={initialTab} />;
 }

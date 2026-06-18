@@ -2,14 +2,7 @@
 import { useMcpList } from "@/hooks/queries/use-mcp-list";
 import type { MCPServerInfo } from "app-types/mcp";
 import { cn } from "lib/utils";
-import {
-  ActivityIcon,
-  BrainIcon,
-  ChevronRight,
-  FolderIcon,
-  KeyRoundIcon,
-  ServerIcon,
-} from "lucide-react";
+import { BrainIcon, ChevronRight, FolderIcon, ServerIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -36,20 +29,9 @@ const SERVER_PANELS: Record<string, Panel[]> = {
   "datapilot-pdf": [
     { key: "files", label: "Files", href: "/files", icon: FolderIcon },
   ],
+  // Requests + API Keys are now tabs inside the single /memory page.
   "mypda-memory": [
     { key: "memories", label: "Memories", href: "/memory", icon: BrainIcon },
-    {
-      key: "requests",
-      label: "Requests",
-      href: "/memory/requests",
-      icon: ActivityIcon,
-    },
-    {
-      key: "keys",
-      label: "API Keys",
-      href: "/memory/keys",
-      icon: KeyRoundIcon,
-    },
   ],
 };
 
