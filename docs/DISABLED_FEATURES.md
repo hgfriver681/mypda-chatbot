@@ -20,7 +20,7 @@ Applied: 2026-06-18 — all five flags set to `false` in `src/lib/ui-flags.ts`.
 | # | Feature | Where it renders | Flag | Status |
 |---|---------|------------------|------|--------|
 | 1 | Sidebar「工作流 / Workflow」link + Tools-dropdown 工作流 submenu | `app-sidebar-menus.tsx` (`<Link href="/workflow">`) and `tool-select-dropdown.tsx` (`<WorkflowToolSelector/>`) | `workflow` | hidden (2026-06-18) |
-| 2 | Sidebar「封存 / 归档 / Archive」section | `src/components/layouts/app-sidebar-menus.tsx` — the `<SidebarMenu className="group/archive">` block (`t("Archive.title")`) and its `<ArchiveDialog>` | `archive` | hidden (2026-06-18) |
+| 2 | 封存 / 归档 / Archive — sidebar section + thread-dropdown「新增到歸檔」 | `app-sidebar-menus.tsx` (`group/archive` block + `<ArchiveDialog>`) and `thread-dropdown.tsx` (the 新增到歸檔 `CommandItem`) | `archive` | hidden (2026-06-18) |
 | 3 | Sidebar「智能體 / Agents」list + 「創建智能體 / Create an agent」card + Tools-dropdown 智慧體 submenu | `<AppSidebarAgents/>` in `app-sidebar.tsx`, and `<AgentSelector/>` in `tool-select-dropdown.tsx` | `agents` | hidden (2026-06-18) |
 | 4 | User menu「報告問題 / Report an issue」 | `src/components/layouts/app-sidebar-user.tsx` — the `reportAnIssue` dropdown item (opens GitHub issues) | `reportIssue` | hidden (2026-06-18) |
 | 5 | User menu「加入社區 / Join community」 | `src/components/layouts/app-sidebar-user.tsx` — the `joinCommunity` dropdown item (opens Discord) | `joinCommunity` | hidden (2026-06-18) |
