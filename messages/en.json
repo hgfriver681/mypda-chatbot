@@ -391,6 +391,7 @@
     "failedToDeleteAllChats": "Failed to delete all threads",
     "failedToDeleteUnarchivedChats": "Failed to delete unarchived threads",
     "chatPreferences": "Chat Preferences",
+    "traditionalDisplay": "Traditional Chinese display",
     "keyboardShortcuts": "Keyboard Shortcuts",
     "theme": "Theme",
     "signOut": "Sign out",

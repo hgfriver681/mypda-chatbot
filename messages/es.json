@@ -247,6 +247,7 @@
     "failedToDeleteAllChats": "Error al eliminar todos los hilos",
     "failedToDeleteUnarchivedChats": "Error al eliminar hilos no archivados",
     "chatPreferences": "Preferencias de Chat",
+    "traditionalDisplay": "Mostrar en chino tradicional",
     "keyboardShortcuts": "Atajos de Teclado",
     "theme": "Tema",
     "signOut": "Cerrar sesión",

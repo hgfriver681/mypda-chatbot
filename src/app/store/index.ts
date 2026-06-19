@@ -1,12 +1,12 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { ChatMention, ChatModel, ChatThread } from "app-types/chat";
-import { AllowedMCPServer, MCPServerInfo } from "app-types/mcp";
-import { OPENAI_VOICE } from "lib/ai/speech/open-ai/use-voice-chat.openai";
-import { WorkflowSummary } from "app-types/workflow";
-import { AppDefaultToolkit } from "lib/ai/tools";
 import { AgentSummary } from "app-types/agent";
 import { ArchiveWithItemCount } from "app-types/archive";
+import { ChatMention, ChatModel, ChatThread } from "app-types/chat";
+import { AllowedMCPServer, MCPServerInfo } from "app-types/mcp";
+import { WorkflowSummary } from "app-types/workflow";
+import { OPENAI_VOICE } from "lib/ai/speech/open-ai/use-voice-chat.openai";
+import { AppDefaultToolkit } from "lib/ai/tools";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface UploadedFile {
   id: string;
@@ -27,6 +27,9 @@ export interface AppState {
   agentList: AgentSummary[];
   workflowToolList: WorkflowSummary[];
   currentThreadId: ChatThread["id"] | null;
+  // Display-only: convert rendered Chinese to Traditional (character-level).
+  // Does not affect stored or transmitted text. Default on.
+  displayTraditional: boolean;
   toolChoice: "auto" | "none" | "manual";
   allowedMcpServers?: Record<string, AllowedMCPServer>;
   allowedAppDefaultToolkit?: AppDefaultToolkit[];
@@ -82,6 +85,7 @@ const initialState: AppState = {
   agentList: [],
   workflowToolList: [],
   currentThreadId: null,
+  displayTraditional: true,
   toolChoice: "auto",
   allowedMcpServers: undefined,
   openUserSettings: false,
@@ -120,6 +124,7 @@ export const appStore = create<AppState & AppDispatch>()(
       name: "mc-app-store-v2.0.1",
       partialize: (state) => ({
         chatModel: state.chatModel || initialState.chatModel,
+        displayTraditional: state.displayTraditional ?? true,
         toolChoice: state.toolChoice || initialState.toolChoice,
         allowedMcpServers:
           state.allowedMcpServers || initialState.allowedMcpServers,

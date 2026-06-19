@@ -263,6 +263,7 @@
     "failedToDeleteAllChats": "채팅 삭제 실패",
     "failedToDeleteUnarchivedChats": "아카이브되지 않은 채팅 삭제 실패",
     "chatPreferences": "채팅 환경설정",
+    "traditionalDisplay": "번체 중국어 표시",
     "keyboardShortcuts": "키보드 단축키",
     "theme": "테마",
     "signOut": "로그아웃",

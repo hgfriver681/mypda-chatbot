@@ -248,6 +248,7 @@
     "failedToDeleteAllChats": "刪除所有執行緒失敗",
     "failedToDeleteUnarchivedChats": "刪除未歸檔執行緒失敗",
     "chatPreferences": "聊天偏好",
+    "traditionalDisplay": "繁體中文顯示",
     "keyboardShortcuts": "鍵盤快捷鍵",
     "theme": "主題",
     "signOut": "登出",

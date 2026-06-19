@@ -247,6 +247,7 @@
     "failedToDeleteAllChats": "すべてのスレッドの削除に失敗しました",
     "failedToDeleteUnarchivedChats": "アーカイブされていないスレッドの削除に失敗しました",
     "chatPreferences": "チャット設定",
+    "traditionalDisplay": "繁体字表示",
     "keyboardShortcuts": "キーボードショートカット",
     "theme": "テーマ",
     "signOut": "サインアウト",

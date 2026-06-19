@@ -247,6 +247,7 @@
     "failedToDeleteAllChats": "Échec de suppression de tous les fils",
     "failedToDeleteUnarchivedChats": "Échec de suppression des fils non archivés",
     "chatPreferences": "Préférences de Chat",
+    "traditionalDisplay": "Affichage en chinois traditionnel",
     "keyboardShortcuts": "Raccourcis Clavier",
     "theme": "Thème",
     "signOut": "Se déconnecter",

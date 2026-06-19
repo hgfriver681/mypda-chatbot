@@ -1,22 +1,24 @@
 "use client";
 
-import { memo, PropsWithChildren } from "react";
+import { appStore } from "@/app/store";
+import { toTraditional } from "lib/util/to-traditional";
+import { isJson, isString, toAny } from "lib/utils";
+import { LinkIcon } from "lucide-react";
+import { PropsWithChildren, memo } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import { PreBlock } from "./pre-block";
-import { isJson, isString, toAny } from "lib/utils";
 import JsonView from "ui/json-view";
-import { LinkIcon } from "lucide-react";
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableRow,
-  TableHead,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "ui/table";
+import { PreBlock } from "./pre-block";
 
 const FadeIn = memo(({ children }: PropsWithChildren) => {
   return <span className="fade-in animate-in duration-1000">{children} </span>;
@@ -187,9 +189,17 @@ const components: Partial<Components> = {
 };
 
 const NonMemoizedMarkdown = ({ children }: { children: string }) => {
+  // Display-only Simplified -> Traditional (character-level). Subscribing to the
+  // store here means toggling the setting re-renders live; memo only blocks
+  // parent-driven re-renders, not store-driven ones. JSON tool output is left
+  // untouched.
+  const displayTraditional = appStore((s) => s.displayTraditional);
+  const isJsonChildren = isJson(children);
+  const text =
+    displayTraditional && !isJsonChildren ? toTraditional(children) : children;
   return (
     <article className="w-full h-full relative">
-      {isJson(children) ? (
+      {isJsonChildren ? (
         <JsonView data={children} />
       ) : (
         <ReactMarkdown
@@ -197,7 +207,7 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
           remarkPlugins={[remarkGfm, remarkMath]}
           rehypePlugins={[rehypeKatex]}
         >
-          {children}
+          {text}
         </ReactMarkdown>
       )}
     </article>

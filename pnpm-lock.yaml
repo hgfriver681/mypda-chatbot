@@ -194,6 +194,9 @@ importers:
       ollama-ai-provider-v2:
         specifier: ^1.5.5
         version: 1.5.5(zod@4.2.1)
+      opencc-js:
+        specifier: ^1.3.1
+        version: 1.3.1
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -276,6 +279,9 @@ importers:
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.27
+      '@types/opencc-js':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@types/pg':
         specifier: ^8.16.0
         version: 8.16.0
@@ -3029,6 +3035,9 @@ packages:
   '@types/node@20.19.27':
     resolution: {integrity: sha512-N2clP5pJhB2YnZJ3PIHFk5RkygRX5WO/5f0WC08tp0wd+sv0rsJk3MqWn3CbNmT2J505a5336jaQj4ph1AdMug==}
 
+  '@types/opencc-js@1.0.3':
+    resolution: {integrity: sha512-TENp7YkI2hNlc4dplhivSHj0hU4DORCK56VY7rniaSfA5f87uD3uv+kPIRuH9h64TGv976iVFi4gEHZZtS2y8Q==}
+
   '@types/pg@8.16.0':
     resolution: {integrity: sha512-RmhMd/wD+CF8Dfo+cVIy3RR5cl8CyfXQ0tGgW6XBL8L4LM/UTEbNXYRbLwU6w+CgrKBNbrQWt4FUtTfaU5jSYQ==}
 
@@ -5416,6 +5425,9 @@ packages:
 
   oniguruma-to-es@4.3.4:
     resolution: {integrity: sha512-3VhUGN3w2eYxnTzHn+ikMI+fp/96KoRSVK9/kMTcFqj1NRDh2IhQCKvYxDnWePKRXY/AqH+Fuiyb7VHSzBjHfA==}
+
+  opencc-js@1.3.1:
+    resolution: {integrity: sha512-EyKDnjHNYlxo3Blll0OGH5qcyZBI3YmXpqeDEity/db50A5TFfCdvylrBlTyx1XvlSRUmh2a5AHvSf89h4u87Q==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -9511,6 +9523,8 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/opencc-js@1.0.3': {}
+
   '@types/pg@8.16.0':
     dependencies:
       '@types/node': 20.19.27
@@ -12368,6 +12382,8 @@ snapshots:
       oniguruma-parser: 0.12.1
       regex: 6.1.0
       regex-recursion: 6.0.2
+
+  opencc-js@1.3.1: {}
 
   optionator@0.9.4:
     dependencies:

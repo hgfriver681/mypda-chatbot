@@ -248,6 +248,7 @@
     "failedToDeleteAllChats": "删除所有线程失败",
     "failedToDeleteUnarchivedChats": "删除未归档线程失败",
     "chatPreferences": "聊天偏好",
+    "traditionalDisplay": "繁体中文显示",
     "keyboardShortcuts": "键盘快捷键",
     "theme": "主题",
     "signOut": "登出",
