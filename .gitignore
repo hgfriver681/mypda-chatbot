@@ -60,3 +60,5 @@ local-data
 openai-compatible.config.ts
 certificates
 public/uploads
+# local memory backup — never commit
+supabase-memory-backup.json
