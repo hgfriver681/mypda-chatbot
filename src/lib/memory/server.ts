@@ -35,10 +35,21 @@ async function requireAccountId(): Promise<string> {
   return session.user.id;
 }
 
+// Demo mode: when MEMORY_SHARED_ACCOUNT_ID is set, every logged-in account
+// reads/writes ONE shared memory pool (so a fresh demo login sees content, and
+// the /memory page matches what the chat's search_memory MCP returns — that MCP
+// uses a static api-key mapping to this same account). Without the env var the
+// behaviour is per-tenant (each user sees only their own). NOTE: this only
+// remaps the `memories` table; thread-ownership checks and API-key management
+// still use the real session user id (never the shared id).
+function sharedOr(userId: string): string {
+  return process.env.MEMORY_SHARED_ACCOUNT_ID?.trim() || userId;
+}
+
 export async function listMyMemories(
   query?: Partial<MemoryListQuery>,
 ): Promise<Memory[]> {
-  const accountId = await requireAccountId();
+  const accountId = sharedOr(await requireAccountId());
   return memoryRepository.listMemories(
     accountId,
     MemoryListQuerySchema.parse(query ?? {}),
@@ -48,19 +59,19 @@ export async function listMyMemories(
 export async function createMyMemory(
   input: CreateMemoryInput,
 ): Promise<Memory> {
-  const accountId = await requireAccountId();
+  const accountId = sharedOr(await requireAccountId());
   return memoryRepository.createMemory(accountId, CreateMemorySchema.parse(input));
 }
 
 export async function deleteMyMemory(id: string): Promise<void> {
-  const accountId = await requireAccountId();
+  const accountId = sharedOr(await requireAccountId());
   await memoryRepository.deleteMemory(accountId, id);
 }
 
 export async function listMyInvocations(
   limit = 100,
 ): Promise<MemoryInvocation[]> {
-  const accountId = await requireAccountId();
+  const accountId = sharedOr(await requireAccountId());
   return memoryRepository.listInvocations(accountId, limit);
 }
 
@@ -142,8 +153,9 @@ async function upsertSession(
 }
 
 export async function syncSessionToMemory(threadId: string): Promise<Memory> {
-  const accountId = await requireAccountId();
-  const messages = await loadOwnedThread(threadId, accountId);
+  const userId = await requireAccountId();
+  const accountId = sharedOr(userId);
+  const messages = await loadOwnedThread(threadId, userId);
   const existing = await memoryRepository.findMemoryBySource(
     accountId,
     sessionSource(threadId),
@@ -163,8 +175,9 @@ export async function toggleSessionHighlight(
   threadId: string,
   messageId: string,
 ): Promise<Memory> {
-  const accountId = await requireAccountId();
-  const messages = await loadOwnedThread(threadId, accountId);
+  const userId = await requireAccountId();
+  const accountId = sharedOr(userId);
+  const messages = await loadOwnedThread(threadId, userId);
   if (!messages.some((m) => m.id === messageId))
     throw new Error("Message not found");
   const existing = await memoryRepository.findMemoryBySource(
@@ -178,8 +191,9 @@ export async function toggleSessionHighlight(
 export async function getSessionMemoryStatus(
   threadId: string,
 ): Promise<SessionMemoryStatus> {
-  const accountId = await requireAccountId();
-  const ok = await chatRepository.checkAccess(threadId, accountId);
+  const userId = await requireAccountId();
+  const accountId = sharedOr(userId);
+  const ok = await chatRepository.checkAccess(threadId, userId);
   if (!ok) throw new Error("Forbidden");
   const messages = await chatRepository.selectMessagesByThreadId(threadId);
   const currentCount = messages.length;
