@@ -94,7 +94,8 @@ const initialState: AppState = {
     AppDefaultToolkit.Visualization,
   ],
   toolPresets: [],
-  chatModel: undefined,
+  // Default model for new users: MiniMax M3 (OpenRouter).
+  chatModel: { provider: "openRouter", model: "minimax-m3" },
   openShortcutsPopup: false,
   openChatPreferences: false,
   mcpCustomizationPopup: undefined,
