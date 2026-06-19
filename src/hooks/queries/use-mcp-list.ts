@@ -14,12 +14,29 @@ export function useMcpList(options?: SWRConfiguration) {
     onError: handleErrorWithToast,
     onSuccess: (data) => {
       const ids = data.map((v) => v.id);
-      appStore.setState((prev) => ({
-        mcpList: data,
-        allowedMcpServers: objectFlow(prev.allowedMcpServers || {}).filter(
-          (_, key) => ids.includes(key),
-        ),
-      }));
+      appStore.setState((prev) => {
+        // Default ON: when the user has never configured tool selection
+        // (allowedMcpServers === undefined), enable every MCP server and all of
+        // its tools so any fresh account/browser starts with MCP tools selected.
+        // Once the user has interacted (object exists, even empty), respect it.
+        if (prev.allowedMcpServers === undefined) {
+          return {
+            mcpList: data,
+            allowedMcpServers: Object.fromEntries(
+              data.map((server) => [
+                server.id,
+                { tools: (server.toolInfo ?? []).map((tool) => tool.name) },
+              ]),
+            ),
+          };
+        }
+        return {
+          mcpList: data,
+          allowedMcpServers: objectFlow(prev.allowedMcpServers).filter(
+            (_, key) => ids.includes(key),
+          ),
+        };
+      });
     },
     ...options,
   });
