@@ -20,11 +20,28 @@ export const useChatModels = (options?: SWRConfiguration) => {
     fallbackData: [],
     onSuccess: (data) => {
       const status = appStore.getState();
-      if (!status.chatModel) {
-        const firstProvider = data[0].provider;
-        const model = data[0].models[0].name;
-        appStore.setState({ chatModel: { provider: firstProvider, model } });
+      if (status.chatModel || !data.length) return;
+      // Default to MiniMax M3 (OpenRouter) when available; otherwise fall back
+      // to the first provider that has an API key, then to the first listed.
+      const hasMinimax = data.some(
+        (p) =>
+          p.provider === "openRouter" &&
+          p.models.some((m) => m.name === "minimax-m3"),
+      );
+      if (hasMinimax) {
+        appStore.setState({
+          chatModel: { provider: "openRouter", model: "minimax-m3" },
+        });
+        return;
       }
+      const provider =
+        data.find((p) => p.hasAPIKey && p.models.length) ?? data[0];
+      appStore.setState({
+        chatModel: {
+          provider: provider.provider,
+          model: provider.models[0].name,
+        },
+      });
     },
     ...options,
   });
