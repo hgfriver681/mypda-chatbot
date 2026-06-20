@@ -11,6 +11,9 @@ import { pgBookmarkRepository } from "./pg/repositories/bookmark-repository.pg";
 import { pgChatExportRepository } from "./pg/repositories/chat-export-repository.pg";
 import { pgMemoryRepository } from "./pg/repositories/memory-repository.pg";
 import { pgApiKeyRepository } from "./pg/repositories/api-key-repository.pg";
+import { pgSkillRepository } from "./pg/repositories/skill-repository.pg";
+import { pgSkillVersionRepository } from "./pg/repositories/skill-version-repository.pg";
+import { pgSkillBundleRepository } from "./pg/repositories/skill-bundle-repository.pg";
 
 export const chatRepository = pgChatRepository;
 export const userRepository = pgUserRepository;
@@ -28,3 +31,7 @@ export const bookmarkRepository = pgBookmarkRepository;
 export const chatExportRepository = pgChatExportRepository;
 export const memoryRepository = pgMemoryRepository;
 export const apiKeyRepository = pgApiKeyRepository;
+
+export const skillRepository = pgSkillRepository;
+export const skillVersionRepository = pgSkillVersionRepository;
+export const skillBundleRepository = pgSkillBundleRepository;

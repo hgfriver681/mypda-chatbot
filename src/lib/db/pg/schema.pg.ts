@@ -1,6 +1,7 @@
 import { Agent } from "app-types/agent";
 import { UserPreferences } from "app-types/user";
 import { MCPServerConfig, MCPToolInfo } from "app-types/mcp";
+import { SkillManifest, SkillBundleLockEntry } from "app-types/skill";
 import { sql } from "drizzle-orm";
 import {
   pgTable,
@@ -406,13 +407,14 @@ export const MemoryTable = pgTable(
     structured: jsonb("structured"),
     kind: text("kind").notNull().default("text"),
     summary: text("summary"),
-    categories: text("categories")
-      .array()
-      .notNull()
-      .default(sql`'{}'::text[]`),
+    categories: text("categories").array().notNull().default(sql`'{}'::text[]`),
     source: text("source"),
-    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("memories_account_idx").on(t.accountId, t.createdAt)],
 );
@@ -427,7 +429,9 @@ export const MemoryApiKeyTable = pgTable(
     keyHash: text("key_hash").notNull().unique(),
     prefix: text("prefix").notNull(),
     name: text("name"),
-    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
     lastUsedAt: timestamp("last_used_at"),
     revokedAt: timestamp("revoked_at"),
   },
@@ -445,7 +449,9 @@ export const MemoryInvocationTable = pgTable(
     query: text("query"),
     retrieved: jsonb("retrieved"),
     latencyMs: integer("latency_ms"),
-    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("invocations_account_idx").on(t.accountId, t.createdAt)],
 );
@@ -453,3 +459,104 @@ export const MemoryInvocationTable = pgTable(
 export type MemoryEntity = typeof MemoryTable.$inferSelect;
 export type MemoryApiKeyEntity = typeof MemoryApiKeyTable.$inferSelect;
 export type MemoryInvocationEntity = typeof MemoryInvocationTable.$inferSelect;
+
+// --- Skill Platform -------------------------------------------------------
+// Web-facing, user-managed skill registry (distinct from .agents/skills, which
+// serves the coding agent). Metadata lives in Postgres; the packaged skill zip
+// lives in S3 via file-storage (ADR-2). Runtime is prompt injection (ADR-1).
+// See docs/skill-platform/.
+
+export const SkillTable = pgTable(
+  "skill",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    name: text("name").notNull(),
+    // Progressive-disclosure summary: stays resident so the model can decide
+    // when to load the skill body.
+    description: text("description").notNull(),
+    version: text("version").notNull().default("0.0.1"),
+    // User-defined single-level group for the sidebar/panel (free-form,
+    // nullable = ungrouped). Mirrors mcp_server.category.
+    category: text("category"),
+    manifest: jsonb("manifest").$type<SkillManifest>(),
+    // S3 object key for the packaged skill zip; null until a zip is attached.
+    storageKey: text("storage_key"),
+    contentHash: text("content_hash"),
+    enabled: boolean("enabled").notNull().default(true),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => UserTable.id, { onDelete: "cascade" }),
+    visibility: varchar("visibility", {
+      enum: ["public", "private"],
+    })
+      .notNull()
+      .default("private"),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    unique("skill_user_name_uq").on(t.userId, t.name),
+    index("skill_user_id_idx").on(t.userId),
+  ],
+);
+
+export const SkillVersionTable = pgTable(
+  "skill_version",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    skillId: uuid("skill_id")
+      .notNull()
+      .references(() => SkillTable.id, { onDelete: "cascade" }),
+    version: text("version").notNull(),
+    storageKey: text("storage_key"),
+    contentHash: text("content_hash"),
+    changelog: text("changelog"),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    unique("skill_version_skill_version_uq").on(t.skillId, t.version),
+    index("skill_version_skill_id_idx").on(t.skillId),
+  ],
+);
+
+export const SkillBundleTable = pgTable(
+  "skill_bundle",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    name: text("name").notNull(),
+    description: text("description"),
+    // Array of member skill ids (VS Code extensionPack / Dify .difybndl model:
+    // members are independently installable, no functional coupling).
+    memberSkillIds: jsonb("member_skill_ids")
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    // Pins each member's exact version + content hash for reproducibility.
+    lock: jsonb("lock").$type<SkillBundleLockEntry[]>(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => UserTable.id, { onDelete: "cascade" }),
+    visibility: varchar("visibility", {
+      enum: ["public", "private"],
+    })
+      .notNull()
+      .default("private"),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("skill_bundle_user_id_idx").on(t.userId)],
+);
+
+export type SkillEntity = typeof SkillTable.$inferSelect;
+export type SkillVersionEntity = typeof SkillVersionTable.$inferSelect;
+export type SkillBundleEntity = typeof SkillBundleTable.$inferSelect;
