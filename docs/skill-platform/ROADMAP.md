@@ -68,7 +68,14 @@ SKILL.md、升版、再打包成自己的標準組。
 
 ## 7. 風險與待辦
 
+- 採用 agentskills.io 開放標準當技能格式（跨工具通用）。見 STANDARD-AND-ECOSYSTEM.md。
+- 驗證器對齊官方規格（Phase 1 必做）：Phase 0 的 `SkillManifestSchema` 目前 `name`
+  max 100、未擋大小寫/連字號/保留字，與官方標準不符。應收緊為 `name` ≤ 64、
+  `^[a-z0-9-]+$`、擋保留字 "anthropic"/"claude"；`description` 非空且 ≤ 1024。
 - Demo 死線日期待確認（見 MEETING-NOTES.md §5）。
-- 上傳安全：zip 解壓需防 path traversal / zip bomb；驗證在執行前完成。
+- 上傳安全：強制「zip 根目錄含資料夾本身」；zip 解壓需防 path traversal / zip bomb；
+  稽核可疑外連/檔案存取（官方視 skill 為「安裝軟體」）；驗證在執行前完成。
 - 權限模型：技能可見性（private / public）沿用 mcp_server visibility 慣例。
 - i18n：新頁面字串走 messages/zh-TW.json，無裸字串。
+- 「Projects / 專案」：未來在 category 之上加 workspace 層（綁 skills + MCP + memory），
+  呼應 claude.ai Projects。
