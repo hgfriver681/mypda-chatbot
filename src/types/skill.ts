@@ -12,10 +12,26 @@ import { z } from "zod";
 export const SEMVER_REGEX = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 export const DEFAULT_SKILL_VERSION = "0.0.1";
 
-// SKILL.md YAML frontmatter (the manifest). `name` + `description` are required
-// by the Agent Skills spec; the rest are optional.
+// Official Agent Skills (agentskills.io) name rules: lowercase letters, digits,
+// and hyphens only; reserved words "anthropic"/"claude" are not allowed.
+export const SKILL_NAME_REGEX = /^[a-z0-9-]+$/;
+const RESERVED_SKILL_NAME_WORDS = ["anthropic", "claude"] as const;
+
+// SKILL.md YAML frontmatter (the manifest), per the open Agent Skills standard.
+// `name` + `description` are required; the rest are optional.
 export const SkillManifestSchema = z.object({
-  name: z.string().min(1).max(100),
+  name: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(
+      SKILL_NAME_REGEX,
+      "name must contain only lowercase letters, numbers, and hyphens",
+    )
+    .refine(
+      (n) => !RESERVED_SKILL_NAME_WORDS.some((w) => n.includes(w)),
+      'name cannot contain the reserved words "anthropic" or "claude"',
+    ),
   description: z.string().min(1).max(1024),
   version: z.string().regex(SEMVER_REGEX).default(DEFAULT_SKILL_VERSION),
   tags: z.array(z.string()).optional(),

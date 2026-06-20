@@ -42,6 +42,26 @@ describe("SkillManifestSchema", () => {
     ).toThrow();
   });
 
+  it("enforces the official name rules (lowercase, hyphen, no reserved words)", () => {
+    // valid
+    expect(
+      SkillManifestSchema.parse({ name: "pdf-tools-2", description: "y" }).name,
+    ).toBe("pdf-tools-2");
+    // invalid: uppercase, underscore, space, reserved words, too long
+    for (const name of [
+      "PdfTools",
+      "my_skill",
+      "my skill",
+      "claude-helper",
+      "anthropic-pdf",
+      "a".repeat(65),
+    ]) {
+      expect(() =>
+        SkillManifestSchema.parse({ name, description: "y" }),
+      ).toThrow();
+    }
+  });
+
   it("keeps optional tags and allowedTools when provided", () => {
     const parsed = SkillManifestSchema.parse({
       name: "x",
