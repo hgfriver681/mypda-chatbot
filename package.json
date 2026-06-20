@@ -98,9 +98,11 @@
     "drizzle-orm": "^0.41.0",
     "emoji-picker-react": "^4.16.1",
     "framer-motion": "^12.23.26",
+    "gray-matter": "^4.0.3",
     "hast-util-to-jsx-runtime": "^2.3.6",
     "ioredis": "^5.8.2",
     "json-schema": "^0.4.0",
+    "jszip": "^3.10.1",
     "katex": "^0.16.27",
     "lucide-react": "^0.486.0",
     "mermaid": "^11.12.2",
@@ -159,10 +161,7 @@
     "vitest": "^3.2.4"
   },
   "lint-staged": {
-    "*.{js,json,mjs,ts,yaml,tsx,css}": [
-      "pnpm format",
-      "pnpm lint:fix"
-    ]
+    "*.{js,json,mjs,ts,yaml,tsx,css}": ["pnpm format", "pnpm lint:fix"]
   },
   "packageManager": "pnpm@10.2.1",
   "engines": {
