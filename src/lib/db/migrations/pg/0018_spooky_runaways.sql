@@ -1,1 +1,1 @@
-ALTER TABLE "chat_export" ADD COLUMN "demo" boolean DEFAULT false NOT NULL;
+ALTER TABLE "chat_export" ADD COLUMN IF NOT EXISTS "demo" boolean DEFAULT false NOT NULL;
