@@ -1,1 +1,1 @@
-ALTER TABLE "mcp_server" ADD COLUMN "category" text;
+ALTER TABLE "mcp_server" ADD COLUMN IF NOT EXISTS "category" text;
