@@ -38,6 +38,7 @@ import { SidebarGroup } from "ui/sidebar";
 import { Skeleton } from "ui/skeleton";
 import { WriteIcon } from "ui/write-icon";
 import { ArchiveDialog } from "../archive-dialog";
+import { AppSidebarArtifacts } from "./app-sidebar-artifacts";
 import { AppSidebarMcp } from "./app-sidebar-mcp";
 import { AppSidebarReplay } from "./app-sidebar-replay";
 
@@ -91,6 +92,8 @@ export function AppSidebarMenus({ user }: { user?: BasicUser }) {
         <AppSidebarMcp />
         {/* Global replay/demo conversations (shared across all accounts). */}
         <AppSidebarReplay />
+        {/* Per-user saved (pinned) MCP Artifacts (UI_FLAGS.savedArtifacts). */}
+        {UI_FLAGS.savedArtifacts && <AppSidebarArtifacts />}
         {/* Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.workflow) */}
         {UI_FLAGS.workflow && (
           <SidebarMenu>

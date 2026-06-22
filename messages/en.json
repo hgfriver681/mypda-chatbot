@@ -404,7 +404,17 @@
     "userSettings": "User Settings",
     "mcpServers": "MCP Servers",
     "more": "More",
-    "replays": "Replays"
+    "replays": "Replays",
+    "savedArtifacts": "Saved Artifacts"
+  },
+  "Artifact": {
+    "pinToSidebar": "Pin",
+    "pinned": "Pinned",
+    "pinFailed": "Failed to pin",
+    "unpin": "Remove",
+    "unpinned": "Removed from sidebar",
+    "deleteFailed": "Failed to remove",
+    "refresh": "Refresh"
   },
   "Archive": {
     "title": "Archive",

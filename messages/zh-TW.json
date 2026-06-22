@@ -261,7 +261,17 @@
     "userSettings": "使用者設定",
     "mcpServers": "MCP 伺服器",
     "more": "更多",
-    "replays": "重播"
+    "replays": "重播",
+    "savedArtifacts": "已釘選的 Artifact"
+  },
+  "Artifact": {
+    "pinToSidebar": "釘到側欄",
+    "pinned": "已釘選",
+    "pinFailed": "釘選失敗",
+    "unpin": "移除",
+    "unpinned": "已從側欄移除",
+    "deleteFailed": "移除失敗",
+    "refresh": "重整"
   },
   "Archive": {
     "title": "歸檔",

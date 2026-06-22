@@ -383,6 +383,25 @@ export const ChatExportCommentTable = pgTable("chat_export_comment", {
   updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+// A saved MCP Artifact: a frozen snapshot of a model-generated mini-app
+// (title + html + the MCP servers it may call), pinned by a user so it shows in
+// their sidebar and can be reopened full-page at /artifact/[id]. Private: read
+// is always filtered by user_id (unlike the global, demo-shared chat_export).
+export const McpArtifactTable = pgTable("mcp_artifact", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => UserTable.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  html: text("html").notNull(),
+  // MCP server names the artifact may call. null = any the user can access.
+  allowedServers: json("allowed_servers").$type<string[]>(),
+  createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export type McpArtifactEntity = typeof McpArtifactTable.$inferSelect;
+
 export type ArchiveEntity = typeof ArchiveTable.$inferSelect;
 export type ArchiveItemEntity = typeof ArchiveItemTable.$inferSelect;
 export type BookmarkEntity = typeof BookmarkTable.$inferSelect;
@@ -406,13 +425,14 @@ export const MemoryTable = pgTable(
     structured: jsonb("structured"),
     kind: text("kind").notNull().default("text"),
     summary: text("summary"),
-    categories: text("categories")
-      .array()
-      .notNull()
-      .default(sql`'{}'::text[]`),
+    categories: text("categories").array().notNull().default(sql`'{}'::text[]`),
     source: text("source"),
-    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("memories_account_idx").on(t.accountId, t.createdAt)],
 );
@@ -427,7 +447,9 @@ export const MemoryApiKeyTable = pgTable(
     keyHash: text("key_hash").notNull().unique(),
     prefix: text("prefix").notNull(),
     name: text("name"),
-    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
     lastUsedAt: timestamp("last_used_at"),
     revokedAt: timestamp("revoked_at"),
   },
@@ -445,7 +467,9 @@ export const MemoryInvocationTable = pgTable(
     query: text("query"),
     retrieved: jsonb("retrieved"),
     latencyMs: integer("latency_ms"),
-    createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: timestamp("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("invocations_account_idx").on(t.accountId, t.createdAt)],
 );

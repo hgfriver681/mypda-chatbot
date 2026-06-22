@@ -33,4 +33,7 @@ export const UI_FLAGS = {
   httpRequest: false,
   // Tools dropdown「MCP Artifacts」toggle (new feature, shown by default)
   mcpArtifacts: true,
+  // Sidebar「已釘選的 Artifact / Saved artifacts」section + pin button on
+  // artifacts (new feature, shown by default).
+  savedArtifacts: true,
 } as const;
