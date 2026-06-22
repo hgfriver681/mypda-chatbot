@@ -92,6 +92,7 @@ const initialState: AppState = {
   allowedAppDefaultToolkit: [
     AppDefaultToolkit.Code,
     AppDefaultToolkit.Visualization,
+    AppDefaultToolkit.Artifacts,
   ],
   toolPresets: [],
   // Default model for new users: MiniMax M3 (OpenRouter).

@@ -31,4 +31,6 @@ export const UI_FLAGS = {
   codeExecution: false,
   // Tools dropdown「HTTP Request」toggle
   httpRequest: false,
+  // Tools dropdown「MCP Artifacts」toggle (new feature, shown by default)
+  mcpArtifacts: true,
 } as const;

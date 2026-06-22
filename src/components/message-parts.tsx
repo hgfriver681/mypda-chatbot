@@ -728,6 +728,15 @@ const ImageGeneratorToolInvocation = dynamic(
   },
 );
 
+const McpArtifactView = dynamic(
+  () =>
+    import("./tool-invocation/mcp-artifact").then((mod) => mod.McpArtifactView),
+  {
+    ssr: false,
+    loading,
+  },
+);
+
 // Local shortcuts for tool invocation approval/rejection
 const approveToolInvocationShortcut: Shortcut = {
   description: "approveToolInvocation",
@@ -924,6 +933,13 @@ export const ToolMessagePart = memo(
           case DefaultToolName.CreateTable:
             return (
               <InteractiveTable
+                key={`${toolCallId}-${toolName}`}
+                {...(input as any)}
+              />
+            );
+          case DefaultToolName.CreateMcpArtifact:
+            return (
+              <McpArtifactView
                 key={`${toolCallId}-${toolName}`}
                 {...(input as any)}
               />

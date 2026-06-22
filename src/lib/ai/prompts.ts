@@ -240,6 +240,40 @@ export const buildMcpServerInstructionsSystemPrompt = (
 ${body}`;
 };
 
+/**
+ * Teaches the model how to author MCP Artifacts: the `create_mcp_artifact` tool,
+ * the `window.mcp` API available inside an artifact, and the menu of MCP servers
+ * + tools an artifact can call.
+ */
+export const buildMcpArtifactSystemPrompt = (
+  servers: { name: string; tools: { name: string; description?: string }[] }[],
+) => {
+  const menu = servers.length
+    ? servers
+        .map(
+          (s) =>
+            `<${s.name}>\n${(s.tools ?? [])
+              .map(
+                (t) =>
+                  `- ${t.name}${t.description ? `: ${t.description}` : ""}`,
+              )
+              .join("\n")}\n</${s.name}>`,
+        )
+        .join("\n")
+    : "(no MCP servers are currently connected)";
+  return `### MCP Artifacts
+You can build an interactive HTML artifact with the \`create_mcp_artifact\` tool. An artifact is a sandboxed, FRONTEND-ONLY web UI whose ONLY backend is MCP. Inside the artifact's HTML, use the injected global API — do NOT use fetch/XHR/WebSocket (they are blocked by CSP):
+- \`await window.mcp.servers()\` -> [{id, name, tools:[{name, description}]}]
+- \`await window.mcp.call(serverName, toolName, argsObject)\` -> the raw MCP tool result
+- \`window.mcp.json(result)\` -> the tool's structured data (handles every result shape)
+- \`window.mcp.text(result)\` -> the tool's text output as a string
+ALWAYS read tool output via \`window.mcp.json(result)\` (for JSON tools) or \`window.mcp.text(result)\` (for text). Do NOT touch \`result.content[0].text\` directly and do NOT assume it is a JSON string. \`json()\` returns null if there is no JSON, so guard before accessing fields (e.g. \`const data = window.mcp.json(r); const files = (data && data.files) || [];\`). Wrap calls in try/catch and show errors in the UI.
+Write a self-contained HTML body (you may include <style> and <script>; CDN libraries from https://cdnjs.cloudflare.com are allowed). Build buttons and interactivity, call MCP tools for data, and render the results. Pass the relevant server name(s) in \`allowedServers\`.
+
+MCP servers and tools available to artifacts:
+${menu}`;
+};
+
 export const buildMcpServerCustomizationsSystemPrompt = (
   instructions: Record<string, McpServerCustomizationsPrompt>,
 ) => {

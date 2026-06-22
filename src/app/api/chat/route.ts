@@ -16,6 +16,7 @@ import globalLogger from "logger";
 import {
   buildMcpServerCustomizationsSystemPrompt,
   buildMcpServerInstructionsSystemPrompt,
+  buildMcpArtifactSystemPrompt,
   buildUserSystemPrompt,
   buildToolCallUnsupportedModelSystemPrompt,
 } from "lib/ai/prompts";
@@ -48,7 +49,7 @@ import { getSession } from "auth/server";
 import { colorize } from "consola/utils";
 import { generateUUID } from "lib/utils";
 import { nanoBananaTool, openaiImageTool } from "lib/ai/tools/image";
-import { ImageToolName } from "lib/ai/tools";
+import { DefaultToolName, ImageToolName } from "lib/ai/tools";
 import { buildCsvIngestionPreviewParts } from "@/lib/ai/ingest/csv-ingest";
 import { serverFileStorage } from "lib/file-storage";
 
@@ -282,10 +283,33 @@ export async function POST(request: Request) {
           }, {});
         }).orElse({});
 
+        // MCP Artifacts: when the artifact tool is active, give the model the
+        // window.mcp API + a menu of the user's MCP servers/tools to build
+        // artifacts against.
+        const mcpArtifactPrompt = await safe(async () => {
+          if (!APP_DEFAULT_TOOLS?.[DefaultToolName.CreateMcpArtifact])
+            return "";
+          const clients = await mcpClientsManager.getClients();
+          const servers = clients
+            .map(({ client }) => {
+              const info = client.getInfo();
+              return {
+                name: info.name,
+                tools: (info.toolInfo ?? []).map((t) => ({
+                  name: t.name,
+                  description: t.description,
+                })),
+              };
+            })
+            .filter((s) => s.tools.length > 0);
+          return buildMcpArtifactSystemPrompt(servers);
+        }).orElse("");
+
         const systemPrompt = mergeSystemPrompt(
           buildUserSystemPrompt(session.user, userPreferences, agent),
           buildMcpServerInstructionsSystemPrompt(mcpServerInstructions),
           buildMcpServerCustomizationsSystemPrompt(mcpServerCustomizations),
+          mcpArtifactPrompt,
           !supportToolCall && buildToolCallUnsupportedModelSystemPrompt,
         );
 

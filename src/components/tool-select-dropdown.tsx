@@ -6,6 +6,7 @@ import { cn, objectFlow } from "lib/utils";
 import {
   ArrowUpRightIcon,
   AtSign,
+  Boxes,
   ChartColumn,
   ChevronRight,
   CodeIcon,
@@ -891,38 +892,46 @@ function AppDefaultToolKitSelector() {
 
   const defaultToolInfo = useMemo(() => {
     const raw = t.raw("Chat.Tool.defaultToolKit");
-    return Object.values(AppDefaultToolkit)
-      // Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.webSearch / codeExecution / httpRequest)
-      .filter((toolkit) => {
-        if (toolkit === AppDefaultToolkit.WebSearch) return UI_FLAGS.webSearch;
-        if (toolkit === AppDefaultToolkit.Code) return UI_FLAGS.codeExecution;
-        if (toolkit === AppDefaultToolkit.Http) return UI_FLAGS.httpRequest;
-        return true;
-      })
-      .map((toolkit) => {
-      const label = raw[toolkit] || toolkit;
-      const id = toolkit;
-      let icon = Wrench;
-      switch (toolkit) {
-        case AppDefaultToolkit.Visualization:
-          icon = ChartColumn;
-          break;
-        case AppDefaultToolkit.WebSearch:
-          icon = GlobeIcon;
-          break;
-        case AppDefaultToolkit.Http:
-          icon = HardDriveUploadIcon;
-          break;
-        case AppDefaultToolkit.Code:
-          icon = CodeIcon;
-          break;
-      }
-      return {
-        label,
-        id,
-        icon,
-      };
-    });
+    return (
+      Object.values(AppDefaultToolkit)
+        // Hidden per docs/DISABLED_FEATURES.md (UI_FLAGS.webSearch / codeExecution / httpRequest)
+        .filter((toolkit) => {
+          if (toolkit === AppDefaultToolkit.WebSearch)
+            return UI_FLAGS.webSearch;
+          if (toolkit === AppDefaultToolkit.Code) return UI_FLAGS.codeExecution;
+          if (toolkit === AppDefaultToolkit.Http) return UI_FLAGS.httpRequest;
+          if (toolkit === AppDefaultToolkit.Artifacts)
+            return UI_FLAGS.mcpArtifacts;
+          return true;
+        })
+        .map((toolkit) => {
+          const label = raw[toolkit] || toolkit;
+          const id = toolkit;
+          let icon = Wrench;
+          switch (toolkit) {
+            case AppDefaultToolkit.Visualization:
+              icon = ChartColumn;
+              break;
+            case AppDefaultToolkit.WebSearch:
+              icon = GlobeIcon;
+              break;
+            case AppDefaultToolkit.Http:
+              icon = HardDriveUploadIcon;
+              break;
+            case AppDefaultToolkit.Code:
+              icon = CodeIcon;
+              break;
+            case AppDefaultToolkit.Artifacts:
+              icon = Boxes;
+              break;
+          }
+          return {
+            label,
+            id,
+            icon,
+          };
+        })
+    );
   }, []);
 
   return (
