@@ -828,7 +828,29 @@
     "ungrouped": "Ungrouped",
     "group": "Group",
     "groupPlaceholder": "Enter or pick a group name",
-    "renameGroup": "Rename group"
+    "renameGroup": "Rename group",
+    "systemPrompt": "System prompt"
+  },
+  "SystemPromptPlayground": {
+    "title": "System Prompt Playground",
+    "description": "Preview the system prompt a new chat would send, and see how it changes as you turn MCP servers on or off.",
+    "serversTitle": "MCP servers",
+    "noServers": "No MCP servers available.",
+    "contributes": "in prompt",
+    "hasCustomization": "has customization",
+    "toolCount": "{count, plural, =0 {no tools} one {# tool} other {# tools}}",
+    "copy": "Copy",
+    "copied": "Copied",
+    "anatomyTitle": "What a model actually receives as input",
+    "anatomyIntro": "A modern model request is made of these parts:",
+    "anatomySystem": "System Prompt — instructions, persona, and context (plain text).",
+    "anatomyTools": "Tools — the list of tool definitions (name + description + parameter schema); this is how the model knows which tools it can call.",
+    "anatomyMessages": "Messages — the conversation itself: user messages (incl. images/PDFs and other multimodal content), assistant replies (incl. reasoning/thinking and tool calls), and tool results.",
+    "anatomyParams": "(Plus settings such as the model, max tokens, and effort — those are parameters, not content.)",
+    "anatomyNote": "This page shows parts 1 (System Prompt) and 2 (Tools). Part 3 (Messages) is the live conversation of each chat and changes as you talk.",
+    "systemPromptTitle": "System Prompt (raw text)",
+    "toolsTitle": "Tools ({count} definitions sent to the model)",
+    "toolsEmpty": "No tools are active, so nothing is sent on the tools channel."
   },
   "Replay": {
     "play": "Play",

@@ -51,6 +51,8 @@ export type MCPServerInfo = {
   status: "connected" | "disconnected" | "loading" | "authorizing";
   lastConnectionStatus?: MCPConnectionStatus | null;
   toolInfo: MCPToolInfo[];
+  // Server-declared usage guidance (MCP protocol `instructions`).
+  instructions?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   userName?: string | null;

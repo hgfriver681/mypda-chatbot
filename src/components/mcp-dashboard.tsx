@@ -11,7 +11,7 @@ import { Skeleton } from "ui/skeleton";
 import { useMcpList } from "@/hooks/queries/use-mcp-list";
 import { BasicUser } from "app-types/user";
 import { cn } from "lib/utils";
-import { Download, LayoutTemplate, Loader2 } from "lucide-react";
+import { Download, LayoutTemplate, Loader2, ScrollText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -135,6 +135,17 @@ export default function MCPDashboard({ message, user }: MCPDashboardProps) {
             <div className="flex-1" />
 
             <div className="flex gap-2">
+              <Link href="/system-prompt">
+                <Button
+                  variant="outline"
+                  className="font-semibold bg-input/20"
+                  data-testid="system-prompt-playground-button"
+                >
+                  <ScrollText className="size-3.5" />
+                  {t("systemPrompt")}
+                </Button>
+              </Link>
+
               {canCreate && mcpList?.length ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

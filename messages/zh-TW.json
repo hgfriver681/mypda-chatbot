@@ -391,7 +391,29 @@
     "ungrouped": "未分組",
     "group": "群組",
     "groupPlaceholder": "輸入或選擇群組名稱",
-    "renameGroup": "重新命名分組"
+    "renameGroup": "重新命名分組",
+    "systemPrompt": "系統提示"
+  },
+  "SystemPromptPlayground": {
+    "title": "系統提示 Playground",
+    "description": "預覽新聊天會送出的系統提示，並即時觀察開啟或關閉 MCP 伺服器時系統提示如何變化。",
+    "serversTitle": "MCP 伺服器",
+    "noServers": "沒有可用的 MCP 伺服器。",
+    "contributes": "已進入提示",
+    "hasCustomization": "有客製說明",
+    "toolCount": "{count, plural, =0 {無工具} other {# 個工具}}",
+    "copy": "複製",
+    "copied": "已複製",
+    "anatomyTitle": "model 實際收到的 input（標準結構）",
+    "anatomyIntro": "一個 model 收到的 input，標準上由這幾塊組成：",
+    "anatomySystem": "System Prompt — 指令、人設、背景（純文字）。",
+    "anatomyTools": "Tools — 可呼叫的工具定義清單（名稱＋說明＋參數 schema）；model 靠這個知道有哪些工具可以呼叫。",
+    "anatomyMessages": "Messages — 對話本身：使用者訊息（含圖片／PDF 等多模態）、assistant 回覆（含推理／thinking 與工具呼叫）、以及工具結果（tool result）。",
+    "anatomyParams": "（另外還有 model、max tokens、effort 等設定，那是參數，不是內容。）",
+    "anatomyNote": "本頁顯示其中的 1（System Prompt）與 2（Tools）；3（Messages）是每段聊天的實際對話，會隨對話變動。",
+    "systemPromptTitle": "System Prompt（原文）",
+    "toolsTitle": "Tools（送給 model 的 {count} 個工具定義）",
+    "toolsEmpty": "目前沒有啟用任何工具，因此 tools 這條管道是空的。"
   },
   "Error": {},
   "Info": {

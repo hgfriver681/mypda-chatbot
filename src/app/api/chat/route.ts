@@ -15,9 +15,11 @@ import { agentRepository, chatRepository } from "lib/db/repository";
 import globalLogger from "logger";
 import {
   buildMcpServerCustomizationsSystemPrompt,
+  buildMcpServerInstructionsSystemPrompt,
   buildUserSystemPrompt,
   buildToolCallUnsupportedModelSystemPrompt,
 } from "lib/ai/prompts";
+import { mcpClientsManager } from "lib/ai/mcp/mcp-manager";
 import {
   chatApiSchemaRequestBodySchema,
   ChatMention,
@@ -262,8 +264,27 @@ export async function POST(request: Request) {
           .map((v) => filterMcpServerCustomizations(MCP_TOOLS!, v))
           .orElse({});
 
+        // Server-declared instructions (MCP protocol `instructions`) for the
+        // servers whose tools are active in this request. Distinct from the
+        // user-authored customizations above.
+        const mcpServerInstructions = await safe(async () => {
+          const activeServerIds = new Set(
+            Object.values(MCP_TOOLS ?? {}).map((t) => t._mcpServerId),
+          );
+          if (activeServerIds.size === 0) return {};
+          const clients = await mcpClientsManager.getClients();
+          return clients.reduce<Record<string, string>>((acc, { client }) => {
+            const info = client.getInfo();
+            if (activeServerIds.has(info.id) && info.instructions?.trim()) {
+              acc[info.name] = info.instructions;
+            }
+            return acc;
+          }, {});
+        }).orElse({});
+
         const systemPrompt = mergeSystemPrompt(
           buildUserSystemPrompt(session.user, userPreferences, agent),
+          buildMcpServerInstructionsSystemPrompt(mcpServerInstructions),
           buildMcpServerCustomizationsSystemPrompt(mcpServerCustomizations),
           !supportToolCall && buildToolCallUnsupportedModelSystemPrompt,
         );

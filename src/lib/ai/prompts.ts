@@ -221,6 +221,25 @@ ${userPreferences.responseStyleExample}
   return prompt.trim();
 };
 
+/**
+ * Server-declared instructions (the MCP protocol's `instructions`, returned by
+ * each server at initialize). Distinct from the user-authored customization
+ * prompt built by `buildMcpServerCustomizationsSystemPrompt`. Keyed by the
+ * platform server name so it lines up with the tool names the model sees.
+ */
+export const buildMcpServerInstructionsSystemPrompt = (
+  instructions: Record<string, string>,
+) => {
+  const entries = Object.entries(instructions).filter(([, v]) => v?.trim());
+  if (!entries.length) return "";
+  const body = entries
+    .map(([name, text]) => `<${name}>\n${text.trim()}\n</${name}>`)
+    .join("\n");
+  return `### MCP Server Instructions
+- The following guidance is provided by each connected MCP server to describe what it is for and how to use its tools.
+${body}`;
+};
+
 export const buildMcpServerCustomizationsSystemPrompt = (
   instructions: Record<string, McpServerCustomizationsPrompt>,
 ) => {

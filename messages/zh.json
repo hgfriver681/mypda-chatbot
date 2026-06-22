@@ -391,7 +391,29 @@
     "ungrouped": "未分组",
     "group": "分组",
     "groupPlaceholder": "输入或选择分组名称",
-    "renameGroup": "重命名分组"
+    "renameGroup": "重命名分组",
+    "systemPrompt": "系统提示"
+  },
+  "SystemPromptPlayground": {
+    "title": "系统提示 Playground",
+    "description": "预览新聊天会发送的系统提示，并实时观察开启或关闭 MCP 服务器时系统提示如何变化。",
+    "serversTitle": "MCP 服务器",
+    "noServers": "没有可用的 MCP 服务器。",
+    "contributes": "已进入提示",
+    "hasCustomization": "有定制说明",
+    "toolCount": "{count, plural, =0 {无工具} other {# 个工具}}",
+    "copy": "复制",
+    "copied": "已复制",
+    "anatomyTitle": "model 实际收到的 input（标准结构）",
+    "anatomyIntro": "一个 model 收到的 input，标准上由这几块组成：",
+    "anatomySystem": "System Prompt — 指令、人设、背景（纯文字）。",
+    "anatomyTools": "Tools — 可调用的工具定义清单（名称＋说明＋参数 schema）；model 靠这个知道有哪些工具可以调用。",
+    "anatomyMessages": "Messages — 对话本身：用户消息（含图片／PDF 等多模态）、assistant 回复（含推理／thinking 与工具调用）、以及工具结果（tool result）。",
+    "anatomyParams": "（另外还有 model、max tokens、effort 等设置，那是参数，不是内容。）",
+    "anatomyNote": "本页显示其中的 1（System Prompt）与 2（Tools）；3（Messages）是每段聊天的实际对话，会随对话变动。",
+    "systemPromptTitle": "System Prompt（原文）",
+    "toolsTitle": "Tools（发送给 model 的 {count} 个工具定义）",
+    "toolsEmpty": "当前没有启用任何工具，因此 tools 这条管道为空。"
   },
   "Error": {},
   "Info": {

@@ -55,6 +55,10 @@ export class MCPClient {
   private oauthProvider?: PgOAuthClientProvider;
   // Information about available tools from the server
   toolInfo: MCPToolInfo[] = [];
+  // Server-level usage guidance declared by the MCP server itself (the
+  // protocol's `instructions`, returned at initialize). Distinct from the
+  // user-authored per-server customization prompt.
+  instructions?: string;
   private disconnectDebounce = createDebounce();
   private needOauthProvider = false;
   private inProgressToolCallIds: string[] = [];
@@ -123,6 +127,7 @@ export class MCPClient {
       status: this.status,
       error: this.error,
       toolInfo: this.toolInfo,
+      instructions: this.instructions,
       visibility: "private" as const,
       enabled: true,
       userId: "", // This will be filled by the manager
@@ -348,6 +353,8 @@ export class MCPClient {
   async updateToolInfo() {
     if (this.status === "connected" && this.client) {
       this.logger.info("Updating tool info");
+      // Capture server-declared instructions (populated after initialize).
+      this.instructions = this.client.getInstructions();
       const toolResponse = await this.client.listTools();
       this.toolInfo = toolResponse.tools.map(
         (tool) =>
