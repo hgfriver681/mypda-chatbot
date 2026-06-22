@@ -1,8 +1,33 @@
 "use client";
 
+import { appStore } from "@/app/store";
 import { buildArtifactDocument } from "lib/artifacts/frame";
 import { Boxes } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
+
+/**
+ * Names of MCP servers enabled in the current chat (the "tools" menu). Artifacts
+ * are scoped to the same servers as direct tool use, so an artifact cannot reach
+ * a server the user has toggled off. Read fresh on each call so toggling takes
+ * effect immediately. Undefined allowedMcpServers = not yet configured = allow all.
+ */
+function enabledServerNames(): Set<string> {
+  const { allowedMcpServers, mcpList } = appStore.getState();
+  const list = mcpList ?? [];
+  return new Set(
+    list
+      .filter(
+        (s) =>
+          !allowedMcpServers ||
+          (allowedMcpServers[s.id]?.tools?.length ?? 0) > 0,
+      )
+      .map((s) => s.name),
+  );
+}
+
+// Platform built-in pseudo-servers that are always available to artifacts,
+// regardless of the chat's MCP server toggle (e.g. the stateless "ai" tool).
+const RESERVED_SERVERS = new Set(["ai"]);
 
 type Props = {
   title?: string;
@@ -79,14 +104,31 @@ export function McpArtifactView({
 
       (async () => {
         try {
+          const enabled = enabledServerNames();
           if (d.op === "list") {
             const j = await callApi("list", {});
-            return j.ok
-              ? respond(true, j.servers)
-              : respond(false, undefined, j.error || "list failed");
+            if (!j.ok)
+              return respond(false, undefined, j.error || "list failed");
+            // Expose reserved built-ins + servers enabled in this chat.
+            const servers = (j.servers ?? []).filter(
+              (s: { name: string }) =>
+                RESERVED_SERVERS.has(s.name) || enabled.has(s.name),
+            );
+            return respond(true, servers);
           }
           if (d.op === "call") {
+            const reserved = RESERVED_SERVERS.has(d.server || "");
+            // Respect the chat's MCP server toggle (reserved built-ins bypass it).
+            if (!reserved && !enabled.has(d.server || "")) {
+              return respond(
+                false,
+                undefined,
+                `server not enabled in this chat: ${d.server}`,
+              );
+            }
+            // Respect the artifact's own declared white-list, if any.
             if (
+              !reserved &&
               Array.isArray(allowedServers) &&
               !allowedServers.includes(d.server || "")
             ) {

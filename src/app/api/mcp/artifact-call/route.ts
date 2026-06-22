@@ -1,6 +1,16 @@
 import { getSession } from "auth/server";
 import { mcpClientsManager } from "lib/ai/mcp/mcp-manager";
+import {
+  ARTIFACT_AI_SERVER,
+  ARTIFACT_AI_SERVER_NAME,
+  runArtifactAi,
+} from "lib/artifacts/ai-tool";
 import { selectMcpClientsAction } from "../actions";
+
+function aiResult(text: string) {
+  // Wrap in the MCP tool-result shape so window.mcp.text/json work uniformly.
+  return { content: [{ type: "text", text }], isError: false };
+}
 
 /**
  * The ONLY backend channel an MCP Artifact can reach.
@@ -31,14 +41,18 @@ export async function POST(request: Request) {
   if (op === "list") {
     return Response.json({
       ok: true,
-      servers: servers.map((s) => ({
-        id: s.id,
-        name: s.name,
-        tools: (s.toolInfo ?? []).map((t) => ({
-          name: t.name,
-          description: t.description,
+      // Built-in platform AI tool first, then the user's MCP servers.
+      servers: [
+        ARTIFACT_AI_SERVER,
+        ...servers.map((s) => ({
+          id: s.id,
+          name: s.name,
+          tools: (s.toolInfo ?? []).map((t) => ({
+            name: t.name,
+            description: t.description,
+          })),
         })),
-      })),
+      ],
     });
   }
 
@@ -50,6 +64,20 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
+    // Built-in platform AI tool (stateless LLM exposed as an MCP-style tool).
+    if (server === ARTIFACT_AI_SERVER_NAME) {
+      try {
+        const text = await runArtifactAi(tool, args ?? {});
+        return Response.json({ ok: true, result: aiResult(text) });
+      } catch (error: any) {
+        return Response.json(
+          { ok: false, error: error?.message ?? "AI call failed" },
+          { status: 200 },
+        );
+      }
+    }
+
     // Resolve by name to an id the user is authorized for; never trust a raw id.
     const target = servers.find((s) => s.name === server || s.id === server);
     if (!target) {

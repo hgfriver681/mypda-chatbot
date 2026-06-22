@@ -268,7 +268,15 @@ You can build an interactive HTML artifact with the \`create_mcp_artifact\` tool
 - \`window.mcp.json(result)\` -> the tool's structured data (handles every result shape)
 - \`window.mcp.text(result)\` -> the tool's text output as a string
 ALWAYS read tool output via \`window.mcp.json(result)\` (for JSON tools) or \`window.mcp.text(result)\` (for text). Do NOT touch \`result.content[0].text\` directly and do NOT assume it is a JSON string. \`json()\` returns null if there is no JSON, so guard before accessing fields (e.g. \`const data = window.mcp.json(r); const files = (data && data.files) || [];\`). Wrap calls in try/catch and show errors in the UI.
+
+DO NOT GUESS A TOOL'S OUTPUT SCHEMA. The tool descriptions below may not list exact field names. When you are not 100% sure of the field/shape a tool returns, make the artifact resilient: first render the raw \`JSON.stringify(window.mcp.json(result), null, 2)\` (or the relevant slice) so the actual field names are visible, then build the polished UI against those real fields. Iterate over arrays/objects generically rather than hard-coding field names you assumed. (Example gotcha: a diff/compare tool may use op values like "replace"/"insert"/"delete" with "a"/"b" fields, not "add"/"remove"/"equal" — inspect the real output, don't assume.)
+
 Write a self-contained HTML body (you may include <style> and <script>; CDN libraries from https://cdnjs.cloudflare.com are allowed). Build buttons and interactivity, call MCP tools for data, and render the results. Pass the relevant server name(s) in \`allowedServers\`.
+
+You also have a BUILT-IN, STATELESS AI tool under the reserved server name "ai" (no MCP server needed, always available):
+- \`window.mcp.call("ai", "summarize", { instruction?, data })\` -> a concise summary of \`data\` (string or object)
+- \`window.mcp.call("ai", "complete", { system?, prompt })\` -> a free-form LLM completion
+Use it to summarize / rewrite / analyze results inside the artifact (e.g. a "Summarize" button that runs the comparison result through \`ai.summarize\`). It is stateless — pass everything it needs in the arguments. Read its output with \`window.mcp.text(result)\`. (No need to list "ai" in \`allowedServers\`.)
 
 MCP servers and tools available to artifacts:
 ${menu}`;

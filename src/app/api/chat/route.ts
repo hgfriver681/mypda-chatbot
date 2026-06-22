@@ -284,24 +284,29 @@ export async function POST(request: Request) {
         }).orElse({});
 
         // MCP Artifacts: when the artifact tool is active, give the model the
-        // window.mcp API + a menu of the user's MCP servers/tools to build
-        // artifacts against.
-        const mcpArtifactPrompt = await safe(async () => {
+        // window.mcp API + a menu of MCP servers/tools to build artifacts
+        // against. Built from MCP_TOOLS, which is already filtered by the chat's
+        // allowedMcpServers / mentions — so artifacts only ever target servers
+        // enabled in this chat, same scope as direct tool use.
+        const mcpArtifactPrompt = safe(() => {
           if (!APP_DEFAULT_TOOLS?.[DefaultToolName.CreateMcpArtifact])
             return "";
-          const clients = await mcpClientsManager.getClients();
-          const servers = clients
-            .map(({ client }) => {
-              const info = client.getInfo();
-              return {
-                name: info.name,
-                tools: (info.toolInfo ?? []).map((t) => ({
-                  name: t.name,
-                  description: t.description,
-                })),
-              };
-            })
-            .filter((s) => s.tools.length > 0);
+          const byServer: Record<
+            string,
+            { name: string; description?: string }[]
+          > = {};
+          for (const t of Object.values(MCP_TOOLS ?? {})) {
+            const serverName = t._mcpServerName;
+            if (!serverName) continue;
+            (byServer[serverName] ??= []).push({
+              name: t._originToolName,
+              description: t.description,
+            });
+          }
+          const servers = Object.entries(byServer).map(([name, tools]) => ({
+            name,
+            tools,
+          }));
           return buildMcpArtifactSystemPrompt(servers);
         }).orElse("");
 
