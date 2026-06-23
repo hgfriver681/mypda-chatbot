@@ -63,7 +63,7 @@ const MCP_BRIDGE = `
           delete _pending[id];
           reject(new Error("MCP call timed out"));
         }
-      }, 30000);
+      }, 180000);
     });
   }
   window.mcp = {

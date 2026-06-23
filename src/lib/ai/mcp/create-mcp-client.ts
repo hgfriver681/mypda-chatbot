@@ -427,10 +427,16 @@ export class MCPClient {
       if (this.status === "authorizing") {
         throw new Error("OAuth authorization required. Try Refresh MCP Client");
       }
-      return client?.callTool({
-        name: toolName,
-        arguments: input as Record<string, unknown>,
-      });
+      return client?.callTool(
+        {
+          name: toolName,
+          arguments: input as Record<string, unknown>,
+        },
+        undefined,
+        // Long-running tools (e.g. PDF subagents calling MiniMax) can take well
+        // over the SDK's 60s default; allow up to 3 min per call.
+        { timeout: 180_000, maxTotalTimeout: 180_000 },
+      );
     };
     return safe(() => this.logger.info("tool call", toolName))
       .ifOk(() => this.scheduleAutoDisconnect()) // disconnect if autoDisconnectSeconds is set
