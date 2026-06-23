@@ -2,8 +2,12 @@
  * MCP Artifact frame: the secure document served into the sandboxed iframe.
  *
  * Security model (defense in depth):
- *  - Served into an <iframe sandbox="allow-scripts"> (no allow-same-origin) so
- *    the document is an opaque origin and cannot touch the parent app.
+ *  - Served into an <iframe sandbox="allow-scripts allow-downloads"> (no
+ *    allow-same-origin) so the document is an opaque origin and cannot touch
+ *    the parent app. allow-downloads lets the artifact trigger a real local
+ *    file download (Blob + <a download>) — e.g. exporting a generated .pptx —
+ *    without which the browser silently turns the click into a navigation that
+ *    just opens a blank tab.
  *  - Strict CSP below: `connect-src 'none'` blocks ALL fetch/XHR/WebSocket, so
  *    the artifact has no network of its own. The ONLY way out is the injected
  *    `window.mcp` bridge, which postMessages to the parent. That is what makes

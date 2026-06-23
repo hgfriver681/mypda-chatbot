@@ -26,6 +26,11 @@ import { Alert, AlertDescription, AlertTitle } from "ui/alert";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
 import { existMcpClientByServerNameAction } from "@/app/api/mcp/actions";
+import { authClient } from "auth/client";
+import { Switch } from "./ui/switch";
+import { Badge } from "./ui/badge";
+import { Separator } from "./ui/separator";
+import { ShieldCheck } from "lucide-react";
 
 interface MCPEditorProps {
   initialConfig?: MCPServerConfig;
@@ -73,6 +78,19 @@ export default function MCPEditor({
   const [jsonString, setJsonString] = useState<string>(
     initialConfig ? JSON.stringify(initialConfig, null, 2) : "",
   );
+
+  // "Bring my login identity" — a flag kept OUTSIDE the JSON textarea so the
+  // editor stays clean and there are no half-typed-JSON race conditions. It is
+  // merged into the saved config (and the preview) only. The real values are
+  // injected server-side from the owner's account at connection time.
+  const { data: session } = authClient.useSession();
+  const [injectIdentity, setInjectIdentity] = useState<boolean>(
+    Boolean((initialConfig as { injectIdentity?: boolean })?.injectIdentity),
+  );
+  const isRemote = isMaybeRemoteConfig(config);
+  const userHeaders = Object.entries(
+    (config as { headers?: Record<string, string> })?.headers ?? {},
+  ).filter(([k]) => !k.toLowerCase().startsWith("x-mypda-"));
 
   // Name validation schema
   const nameSchema = z.string().regex(/^[a-zA-Z0-9\-]+$/, {
@@ -144,7 +162,9 @@ export default function MCPEditor({
           method: "POST",
           body: JSON.stringify({
             name,
-            config,
+            config: isMaybeRemoteConfig(config)
+              ? { ...config, injectIdentity }
+              : config,
             id,
           }),
         }),
@@ -224,7 +244,7 @@ export default function MCPEditor({
                   preview
                 </Label>
                 <JsonView
-                  data={config}
+                  data={isRemote ? { ...config, injectIdentity } : config}
                   initialExpandDepth={3}
                   data-testid="mcp-config-view"
                 />
@@ -244,6 +264,95 @@ export default function MCPEditor({
             </div>
           </div>
         </div>
+
+        {/* Inject login identity — only meaningful for remote (URL) servers */}
+        {isRemote && (
+          <div className="space-y-3 rounded-lg border p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-1">
+                <Label
+                  htmlFor="inject-identity"
+                  className="flex items-center gap-2"
+                >
+                  <ShieldCheck className="size-4" />
+                  自動帶入我的登入身分
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  連線時由平台自動加上 x-mypda-user-id / email /
+                  role。值來自你的帳號,不會寫進設定、也無法竄改。
+                </p>
+              </div>
+              <Switch
+                id="inject-identity"
+                checked={injectIdentity}
+                onCheckedChange={setInjectIdentity}
+              />
+            </div>
+
+            {injectIdentity && (
+              <>
+                <Separator />
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    你目前的登入身分
+                  </p>
+                  <div className="grid grid-cols-[5rem_1fr] gap-x-3 gap-y-1 text-xs">
+                    <span className="text-muted-foreground">姓名</span>
+                    <span>{session?.user?.name ?? "—"}</span>
+                    <span className="text-muted-foreground">Email</span>
+                    <span>{session?.user?.email ?? "—"}</span>
+                    <span className="text-muted-foreground">角色</span>
+                    <span>
+                      {(session?.user as { role?: string })?.role ?? "—"}
+                    </span>
+                    <span className="text-muted-foreground">User ID</span>
+                    <span className="font-mono break-all">
+                      {session?.user?.id ?? "—"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    送出時 MCP server 實際會收到的 headers
+                  </p>
+                  <div className="rounded-md bg-secondary p-3 font-mono text-xs space-y-1">
+                    {userHeaders.map(([k, v]) => (
+                      <div key={k}>
+                        <span className="text-muted-foreground">{k}</span>:{" "}
+                        {String(v)}
+                      </div>
+                    ))}
+                    {(
+                      [
+                        ["x-mypda-user-id", session?.user?.id],
+                        ["x-mypda-email", session?.user?.email],
+                        [
+                          "x-mypda-role",
+                          (session?.user as { role?: string })?.role,
+                        ],
+                      ] as [string, string | undefined][]
+                    ).map(([k, v]) => (
+                      <div key={k} className="flex items-center gap-2">
+                        <span>
+                          <span className="text-muted-foreground">{k}</span>:{" "}
+                          {v ?? "—"}
+                        </span>
+                        <Badge variant="secondary" className="text-[10px]">
+                          自動帶入
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    僅對信任網域(預設
+                    *.mypda.ai)生效;非機密,工作坊刻意公開顯示。
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Save button */}
         <Button onClick={handleSave} className="w-full" disabled={saveDisabled}>

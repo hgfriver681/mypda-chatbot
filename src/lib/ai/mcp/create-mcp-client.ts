@@ -34,7 +34,53 @@ type ClientOptions = {
   initialToolInfo?: MCPToolInfo[];
   onToolInfoUpdate?: (toolInfo: MCPToolInfo[]) => void;
   onConnectionStatusChange?: (status: "connected" | "error") => void;
+  // Owner identity injected into outgoing requests when config.injectIdentity
+  // is set. Resolved by the manager from the server's owning account, so it is
+  // the real logged-in user and cannot be forged via the config.
+  identity?: { id: string; email?: string; role?: string };
 };
+
+// Suffixes whose hosts may receive injected identity headers. Prevents leaking
+// the user's id/email to arbitrary third-party MCP servers.
+const IDENTITY_TRUSTED_HOSTS = (
+  process.env.MCP_IDENTITY_TRUSTED_HOSTS ?? "mypda.ai"
+)
+  .split(",")
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+
+function isIdentityTrustedHost(host: string): boolean {
+  const h = host.toLowerCase();
+  return IDENTITY_TRUSTED_HOSTS.some(
+    (suffix) => h === suffix || h.endsWith(`.${suffix}`),
+  );
+}
+
+/**
+ * Outgoing headers for a remote MCP request. Always strips any client-supplied
+ * `x-mypda-*` (so identity can't be hand-forged in the config), then injects the
+ * owner's real identity when injectIdentity is on and the host is trusted.
+ */
+function buildEffectiveHeaders(
+  config: { headers?: Record<string, string>; injectIdentity?: boolean },
+  url: URL,
+  identity?: { id: string; email?: string; role?: string },
+): Record<string, string> {
+  const base: Record<string, string> = {};
+  for (const [k, v] of Object.entries(config.headers ?? {})) {
+    if (!k.toLowerCase().startsWith("x-mypda-")) base[k] = v;
+  }
+  if (
+    config.injectIdentity &&
+    identity?.id &&
+    isIdentityTrustedHost(url.hostname)
+  ) {
+    base["x-mypda-user-id"] = identity.id;
+    if (identity.email) base["x-mypda-email"] = identity.email;
+    if (identity.role) base["x-mypda-role"] = identity.role;
+  }
+  return base;
+}
 
 const CONNET_TIMEOUT = IS_VERCEL_ENV ? 30000 : 120000;
 const MCP_MAX_TOTAL_TIMEOUT = process.env.MCP_MAX_TOTAL_TIMEOUT
@@ -243,10 +289,15 @@ export class MCPClient {
         const config = MCPRemoteConfigZodSchema.parse(this.serverConfig);
         const abortController = new AbortController();
         const url = new URL(config.url);
+        const effectiveHeaders = buildEffectiveHeaders(
+          config,
+          url,
+          this.options.identity,
+        );
         try {
           this.transport = new StreamableHTTPClientTransport(url, {
             requestInit: {
-              headers: config.headers,
+              headers: effectiveHeaders,
               signal: abortController.signal,
             },
             authProvider: this.createOAuthProvider(oauthState),
@@ -276,7 +327,7 @@ export class MCPClient {
 
             this.transport = new SSEClientTransport(url, {
               requestInit: {
-                headers: config.headers,
+                headers: effectiveHeaders,
                 signal: abortController.signal,
               },
               authProvider: this.createOAuthProvider(oauthState),

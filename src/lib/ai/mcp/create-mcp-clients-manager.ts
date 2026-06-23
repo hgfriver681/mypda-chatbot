@@ -17,6 +17,7 @@ import {
 } from "lib/utils";
 import { safe } from "ts-safe";
 import { McpServerTable } from "lib/db/pg/schema.pg";
+import { userRepository } from "lib/db/repository";
 import { createMCPToolId } from "./mcp-tool-id";
 import globalLogger from "logger";
 import { jsonSchema, ToolCallOptions } from "ai";
@@ -99,13 +100,25 @@ export class MCPClientsManager {
           const configs = await this.storage.loadAll();
           await Promise.all(
             configs.map(
-              ({ id, name, config, toolInfo, lastConnectionStatus }) => {
+              ({
+                id,
+                name,
+                config,
+                toolInfo,
+                lastConnectionStatus,
+                userId,
+              }) => {
                 if (toolInfo?.length) {
                   this.logger.info(
                     `Loading cached tool info for ${name} (${toolInfo.length} tools)`,
                   );
-                  this.addClientWithCachedToolInfo(id, name, config, toolInfo);
-                  return Promise.resolve();
+                  return this.addClientWithCachedToolInfo(
+                    id,
+                    name,
+                    config,
+                    toolInfo,
+                    userId,
+                  );
                 }
                 // Register errored servers without connecting
                 // — user can manually refresh these from the UI
@@ -113,11 +126,16 @@ export class MCPClientsManager {
                   this.logger.info(
                     `Registering ${name} without connect (last status: error)`,
                   );
-                  this.addClientWithCachedToolInfo(id, name, config, []);
-                  return Promise.resolve();
+                  return this.addClientWithCachedToolInfo(
+                    id,
+                    name,
+                    config,
+                    [],
+                    userId,
+                  );
                 }
                 // New servers or servers without cache — connect in background
-                return this.addClient(id, name, config).catch(() => {
+                return this.addClient(id, name, config, userId).catch(() => {
                   `ignore error`;
                 });
               },
@@ -175,22 +193,51 @@ export class MCPClientsManager {
     );
   }
   /**
+   * Resolves the owner's real identity for header injection, but only when the
+   * server opted in via config.injectIdentity. Values come from the owning
+   * account (never the config), so they can't be forged or go stale.
+   */
+  private async resolveIdentity(
+    serverConfig: MCPServerConfig,
+    ownerUserId?: string,
+  ): Promise<{ id: string; email?: string; role?: string } | undefined> {
+    if (!ownerUserId) return undefined;
+    if (!(serverConfig as { injectIdentity?: boolean })?.injectIdentity) {
+      return undefined;
+    }
+    try {
+      const u = await userRepository.getUserById(ownerUserId);
+      if (!u) return undefined;
+      return {
+        id: u.id,
+        email: u.email ?? "",
+        role: (u as { role?: string }).role ?? "",
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
    * Creates a client with cached tool info but does NOT connect.
    * The connection will happen lazily when a tool is actually called.
    */
-  private addClientWithCachedToolInfo(
+  private async addClientWithCachedToolInfo(
     id: string,
     name: string,
     serverConfig: MCPServerConfig,
     cachedToolInfo: MCPToolInfo[],
+    ownerUserId?: string,
   ) {
     if (this.clients.has(id)) {
       const prevClient = this.clients.get(id)!;
       void prevClient.client.disconnect();
     }
+    const identity = await this.resolveIdentity(serverConfig, ownerUserId);
     const client = createMCPClient(id, name, serverConfig, {
       autoDisconnectSeconds: this.autoDisconnectSeconds,
       initialToolInfo: cachedToolInfo,
+      identity,
       onToolInfoUpdate: (toolInfo) => {
         this.storage?.updateToolInfo?.(id, toolInfo);
       },
@@ -204,13 +251,20 @@ export class MCPClientsManager {
   /**
    * Creates and adds a new client instance to memory only (no storage persistence)
    */
-  async addClient(id: string, name: string, serverConfig: MCPServerConfig) {
+  async addClient(
+    id: string,
+    name: string,
+    serverConfig: MCPServerConfig,
+    ownerUserId?: string,
+  ) {
     if (this.clients.has(id)) {
       const prevClient = this.clients.get(id)!;
       void prevClient.client.disconnect();
     }
+    const identity = await this.resolveIdentity(serverConfig, ownerUserId);
     const client = createMCPClient(id, name, serverConfig, {
       autoDisconnectSeconds: this.autoDisconnectSeconds,
+      identity,
       onToolInfoUpdate: (toolInfo) => {
         this.storage?.updateToolInfo?.(id, toolInfo);
       },
@@ -231,12 +285,14 @@ export class MCPClientsManager {
       const entity = await this.storage.save(server);
       id = entity.id;
     }
-    await this.addClient(id, server.name, server.config).catch((err) => {
-      if (!server.id) {
-        void this.removeClient(id);
-      }
-      throw err;
-    });
+    await this.addClient(id, server.name, server.config, server.userId).catch(
+      (err) => {
+        if (!server.id) {
+          void this.removeClient(id);
+        }
+        throw err;
+      },
+    );
 
     return this.clients.get(id)!;
   }
@@ -271,7 +327,7 @@ export class MCPClientsManager {
       throw new Error(`Client ${id} not found`);
     }
     this.logger.info(`Refreshing client ${server.name}`);
-    await this.addClient(id, server.name, server.config);
+    await this.addClient(id, server.name, server.config, server.userId);
     return this.clients.get(id)!;
   }
 

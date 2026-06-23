@@ -204,7 +204,7 @@ export function McpArtifactView({
       ref={ref}
       title={title}
       srcDoc={srcDoc}
-      sandbox="allow-scripts"
+      sandbox="allow-scripts allow-downloads"
       className={cn(
         "w-full bg-[#0b0c0e] block",
         standalone && "flex-1 min-h-0",

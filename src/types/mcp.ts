@@ -9,6 +9,11 @@ import { z } from "zod";
 export const MCPRemoteConfigZodSchema = z.object({
   url: z.string().url().describe("The URL of the SSE endpoint"),
   headers: z.record(z.string(), z.string()).optional(),
+  // When true, the platform injects the logged-in user's identity
+  // (x-mypda-user-id / email / role) into outgoing requests at connection time.
+  // Only a boolean is stored — the actual values come from the owner's account,
+  // never from the config, so they can't be forged or go stale.
+  injectIdentity: z.boolean().optional(),
 });
 
 export const MCPStdioConfigZodSchema = z.object({
