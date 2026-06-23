@@ -1,10 +1,10 @@
-import { McpServerCustomizationsPrompt, MCPToolInfo } from "app-types/mcp";
+import { MCPToolInfo, McpServerCustomizationsPrompt } from "app-types/mcp";
 
+import { Agent } from "app-types/agent";
 import { UserPreferences } from "app-types/user";
 import { User } from "better-auth";
-import { createMCPToolId } from "./mcp/mcp-tool-id";
 import { format } from "date-fns";
-import { Agent } from "app-types/agent";
+import { createMCPToolId } from "./mcp/mcp-tool-id";
 
 export const CREATE_THREAD_TITLE_PROMPT = `
 You are a chat title generation expert.
@@ -275,8 +275,9 @@ Write a self-contained HTML body (you may include <style> and <script>; CDN libr
 
 You also have a BUILT-IN, STATELESS AI tool under the reserved server name "ai" (no MCP server needed, always available):
 - \`window.mcp.call("ai", "summarize", { instruction?, data })\` -> a concise summary of \`data\` (string or object)
-- \`window.mcp.call("ai", "complete", { system?, prompt })\` -> a free-form LLM completion
-Use it to summarize / rewrite / analyze results inside the artifact (e.g. a "Summarize" button that runs the comparison result through \`ai.summarize\`). It is stateless — pass everything it needs in the arguments. Read its output with \`window.mcp.text(result)\`. (No need to list "ai" in \`allowedServers\`.)
+- \`window.mcp.call("ai", "complete", { system?, prompt, image? })\` -> a free-form LLM completion; pass \`image\` (http(s) URL, data: URL, or raw base64) to ask about an image (vision)
+- \`window.mcp.call("ai", "ocr", { image, instruction?, mimeType? })\` -> read text from an image (OCR) via a vision model; \`image\` is an http(s) URL, data: URL, or raw base64. Pass an \`instruction\` to extract structured fields instead of raw text.
+Use it to summarize / rewrite / analyze results inside the artifact (e.g. a "Summarize" button that runs the comparison result through \`ai.summarize\`, or an "OCR" button that runs an uploaded image through \`ai.ocr\`). It is stateless — pass everything it needs in the arguments. Read its output with \`window.mcp.text(result)\`. (No need to list "ai" in \`allowedServers\`.)
 
 MCP servers and tools available to artifacts:
 ${menu}`;
