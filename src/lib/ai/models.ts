@@ -8,10 +8,12 @@ import { xai } from "@ai-sdk/xai";
 import { LanguageModelV2, openrouter } from "@openrouter/ai-sdk-provider";
 import { createGroq } from "@ai-sdk/groq";
 import { LanguageModel } from "ai";
+import { createOpenAICompatibleModels } from "./create-openai-compatiable";
 import {
-  createOpenAICompatibleModels,
-  openaiCompatibleModelsSafeParse,
-} from "./create-openai-compatiable";
+  defaultCatalog,
+  getModelCatalog,
+  type ModelCatalog,
+} from "./model-catalog";
 import { ChatModel } from "app-types/chat";
 import {
   DEFAULT_FILE_PART_MIME_TYPES,
@@ -29,7 +31,9 @@ const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-const staticModels = {
+// Providers fixed in code. OpenRouter + OpenAI-compatible (NCHC...) are NOT
+// here — they come from the DB-backed, admin-editable catalog (model-catalog.ts).
+const fixedStaticModels = {
   openai: {
     "gpt-4.1": openai("gpt-4.1"),
     "gpt-4.1-mini": openai("gpt-4.1-mini"),
@@ -68,35 +72,20 @@ const staticModels = {
     "gpt-oss-120b": groq("openai/gpt-oss-120b"),
     "qwen3-32b": groq("qwen/qwen3-32b"),
   },
-  openRouter: {
-    "minimax-m3": openrouter("minimax/minimax-m3"),
-    "gpt-oss-20b:free": openrouter("openai/gpt-oss-20b:free"),
-    "qwen3-8b:free": openrouter("qwen/qwen3-8b:free"),
-    "qwen3-14b:free": openrouter("qwen/qwen3-14b:free"),
-    "qwen3-coder:free": openrouter("qwen/qwen3-coder:free"),
-    "deepseek-r1:free": openrouter("deepseek/deepseek-r1-0528:free"),
-    "deepseek-v3:free": openrouter("deepseek/deepseek-chat-v3-0324:free"),
-    "gemini-2.0-flash-exp:free": openrouter("google/gemini-2.0-flash-exp:free"),
-  },
 };
 
-const staticUnsupportedModels = new Set([
-  staticModels.openai["o4-mini"],
-  staticModels.ollama["gemma3:1b"],
-  staticModels.ollama["gemma3:4b"],
-  staticModels.ollama["gemma3:12b"],
-  staticModels.openRouter["gpt-oss-20b:free"],
-  staticModels.openRouter["qwen3-8b:free"],
-  staticModels.openRouter["qwen3-14b:free"],
-  staticModels.openRouter["deepseek-r1:free"],
-  staticModels.openRouter["gemini-2.0-flash-exp:free"],
+const fixedUnsupportedModels = new Set<LanguageModel>([
+  fixedStaticModels.openai["o4-mini"],
+  fixedStaticModels.ollama["gemma3:1b"],
+  fixedStaticModels.ollama["gemma3:4b"],
+  fixedStaticModels.ollama["gemma3:12b"],
 ]);
 
 const staticSupportImageInputModels = {
-  ...staticModels.google,
-  ...staticModels.xai,
-  ...staticModels.openai,
-  ...staticModels.anthropic,
+  ...fixedStaticModels.google,
+  ...fixedStaticModels.xai,
+  ...fixedStaticModels.openai,
+  ...fixedStaticModels.anthropic,
 };
 
 const staticFilePartSupportByModel = new Map<
@@ -112,65 +101,31 @@ const registerFileSupport = (
   staticFilePartSupportByModel.set(model, Array.from(mimeTypes));
 };
 
-registerFileSupport(staticModels.openai["gpt-4.1"], OPENAI_FILE_MIME_TYPES);
 registerFileSupport(
-  staticModels.openai["gpt-4.1-mini"],
+  fixedStaticModels.openai["gpt-4.1"],
   OPENAI_FILE_MIME_TYPES,
 );
-registerFileSupport(staticModels.openai["gpt-5"], OPENAI_FILE_MIME_TYPES);
-registerFileSupport(staticModels.openai["gpt-5-mini"], OPENAI_FILE_MIME_TYPES);
-registerFileSupport(staticModels.openai["gpt-5-nano"], OPENAI_FILE_MIME_TYPES);
-
 registerFileSupport(
-  staticModels.google["gemini-2.5-flash-lite"],
+  fixedStaticModels.openai["gpt-4.1-mini"],
+  OPENAI_FILE_MIME_TYPES,
+);
+registerFileSupport(
+  fixedStaticModels.google["gemini-2.5-flash-lite"],
   GEMINI_FILE_MIME_TYPES,
 );
 registerFileSupport(
-  staticModels.google["gemini-2.5-flash"],
+  fixedStaticModels.google["gemini-2.5-flash"],
   GEMINI_FILE_MIME_TYPES,
 );
 registerFileSupport(
-  staticModels.google["gemini-2.5-pro"],
+  fixedStaticModels.google["gemini-2.5-pro"],
   GEMINI_FILE_MIME_TYPES,
 );
-
 registerFileSupport(
-  staticModels.anthropic["sonnet-4.5"],
+  fixedStaticModels.anthropic["sonnet-4.5"],
   ANTHROPIC_FILE_MIME_TYPES,
 );
-registerFileSupport(
-  staticModels.anthropic["opus-4.1"],
-  ANTHROPIC_FILE_MIME_TYPES,
-);
-
-registerFileSupport(staticModels.xai["grok-4-fast"], XAI_FILE_MIME_TYPES);
-registerFileSupport(staticModels.xai["grok-4"], XAI_FILE_MIME_TYPES);
-registerFileSupport(staticModels.xai["grok-3"], XAI_FILE_MIME_TYPES);
-registerFileSupport(staticModels.xai["grok-3-mini"], XAI_FILE_MIME_TYPES);
-registerFileSupport(
-  staticModels.openRouter["gemini-2.0-flash-exp:free"],
-  GEMINI_FILE_MIME_TYPES,
-);
-
-const openaiCompatibleProviders = openaiCompatibleModelsSafeParse(
-  process.env.OPENAI_COMPATIBLE_DATA,
-);
-
-const {
-  providers: openaiCompatibleModels,
-  unsupportedModels: openaiCompatibleUnsupportedModels,
-} = createOpenAICompatibleModels(openaiCompatibleProviders);
-
-const allModels = { ...openaiCompatibleModels, ...staticModels };
-
-const allUnsupportedModels = new Set([
-  ...openaiCompatibleUnsupportedModels,
-  ...staticUnsupportedModels,
-]);
-
-export const isToolCallUnsupportedModel = (model: LanguageModel) => {
-  return allUnsupportedModels.has(model);
-};
+registerFileSupport(fixedStaticModels.xai["grok-3-mini"], XAI_FILE_MIME_TYPES);
 
 const isImageInputUnsupportedModel = (model: LanguageModelV2) => {
   return !Object.values(staticSupportImageInputModels).includes(model);
@@ -180,26 +135,131 @@ export const getFilePartSupportedMimeTypes = (model: LanguageModel) => {
   return staticFilePartSupportByModel.get(model) ?? [];
 };
 
-const fallbackModel = staticModels.openRouter["minimax-m3"];
+// ---- dynamic catalog (OpenRouter + OpenAI-compatible) ----------------------
+
+type ModelInfo = {
+  provider: string;
+  models: {
+    name: string;
+    isToolCallUnsupported: boolean;
+    isImageInputUnsupported: boolean;
+    supportedFileMimeTypes: string[];
+  }[];
+  hasAPIKey: boolean;
+};
+
+type BuiltCatalog = {
+  allModels: Record<string, Record<string, LanguageModel>>;
+  unsupported: Set<LanguageModel>;
+  fallbackModel: LanguageModel;
+  modelsInfo: ModelInfo[];
+};
+
+function buildOpenRouterModels(
+  entries: ModelCatalog["openRouter"],
+): Record<string, LanguageModel> {
+  const out: Record<string, LanguageModel> = {};
+  for (const e of entries) {
+    out[e.uiName] = openrouter(e.apiName) as LanguageModel;
+  }
+  return out;
+}
+
+function build(catalog: ModelCatalog): BuiltCatalog {
+  const openRouterModels = buildOpenRouterModels(catalog.openRouter);
+  const { providers: oaiCompat, unsupportedModels: oaiUnsupported } =
+    createOpenAICompatibleModels(catalog.openaiCompatible);
+
+  const allModels: Record<string, Record<string, LanguageModel>> = {
+    ...oaiCompat,
+    ...fixedStaticModels,
+    openRouter: openRouterModels,
+  };
+
+  const unsupported = new Set<LanguageModel>([
+    ...fixedUnsupportedModels,
+    ...oaiUnsupported,
+  ]);
+  for (const e of catalog.openRouter) {
+    if (e.supportsTools === false) unsupported.add(openRouterModels[e.uiName]);
+  }
+
+  const fallbackModel =
+    openRouterModels["minimax-m3"] ??
+    Object.values(openRouterModels)[0] ??
+    fixedStaticModels.openai["gpt-4.1"];
+
+  const modelsInfo: ModelInfo[] = Object.entries(allModels).map(
+    ([provider, models]) => ({
+      provider,
+      models: Object.entries(models).map(([name, model]) => ({
+        name,
+        isToolCallUnsupported: unsupported.has(model),
+        isImageInputUnsupported: isImageInputUnsupportedModel(
+          model as LanguageModelV2,
+        ),
+        supportedFileMimeTypes: [...getFilePartSupportedMimeTypes(model)],
+      })),
+      hasAPIKey: checkProviderAPIKey(provider),
+    }),
+  );
+
+  return { allModels, unsupported, fallbackModel, modelsInfo };
+}
+
+const REFRESH_TTL_MS = 30_000;
+let currentCatalog: ModelCatalog = defaultCatalog();
+let built: BuiltCatalog = build(currentCatalog);
+let lastRefresh = 0;
+let refreshInFlight: Promise<void> | null = null;
+
+/** Reload the catalog from DB and rebuild the in-memory model snapshot. */
+export function refreshModelCatalog(): Promise<void> {
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = (async () => {
+    try {
+      const catalog = await getModelCatalog();
+      currentCatalog = catalog;
+      built = build(catalog);
+      lastRefresh = Date.now();
+    } catch {
+      // keep the previous snapshot on failure
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  return refreshInFlight;
+}
+
+function maybeRefresh() {
+  if (!refreshInFlight && Date.now() - lastRefresh > REFRESH_TTL_MS) {
+    void refreshModelCatalog();
+  }
+}
+
+// Kick off the first DB-backed refresh (non-blocking; import-time snapshot from
+// defaults keeps the app working until this resolves).
+void refreshModelCatalog();
+
+export const isToolCallUnsupportedModel = (model: LanguageModel) => {
+  return built.unsupported.has(model);
+};
 
 export const customModelProvider = {
-  modelsInfo: Object.entries(allModels).map(([provider, models]) => ({
-    provider,
-    models: Object.entries(models).map(([name, model]) => ({
-      name,
-      isToolCallUnsupported: isToolCallUnsupportedModel(model),
-      isImageInputUnsupported: isImageInputUnsupportedModel(model),
-      supportedFileMimeTypes: [...getFilePartSupportedMimeTypes(model)],
-    })),
-    hasAPIKey: checkProviderAPIKey(provider as keyof typeof staticModels),
-  })),
+  get modelsInfo(): ModelInfo[] {
+    maybeRefresh();
+    return built.modelsInfo;
+  },
   getModel: (model?: ChatModel): LanguageModel => {
-    if (!model) return fallbackModel;
-    return allModels[model.provider]?.[model.model] || fallbackModel;
+    maybeRefresh();
+    if (!model) return built.fallbackModel;
+    return (
+      built.allModels[model.provider]?.[model.model] || built.fallbackModel
+    );
   },
 };
 
-function checkProviderAPIKey(provider: keyof typeof staticModels) {
+function checkProviderAPIKey(provider: string) {
   let key: string | undefined;
   switch (provider) {
     case "openai":
@@ -220,8 +280,13 @@ function checkProviderAPIKey(provider: keyof typeof staticModels) {
     case "openRouter":
       key = process.env.OPENROUTER_API_KEY;
       break;
+    case "ollama":
+      // Disabled on the platform by default (greys out like xai/anthropic).
+      // Set OLLAMA_ENABLED=1 to surface it again.
+      key = process.env.OLLAMA_ENABLED ? "ok" : undefined;
+      break;
     default:
-      return true; // assume the provider has an API key
+      return true; // OpenAI-compatible providers (NCHC...) carry their own key
   }
   return !!key && key != "****";
 }

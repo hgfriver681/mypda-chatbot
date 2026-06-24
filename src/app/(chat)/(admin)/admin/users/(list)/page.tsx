@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Button } from "ui/button";
 import { UsersTable } from "@/components/admin/users-table";
 import { AdminMcpBulkActions } from "@/components/admin/admin-mcp-bulk-actions";
 import {
@@ -55,7 +57,10 @@ export default async function UserListPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end px-4 pt-4 md:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4 md:px-6">
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/models">模型管理</Link>
+        </Button>
         <AdminMcpBulkActions />
       </div>
       <UsersTable

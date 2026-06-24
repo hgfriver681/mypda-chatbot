@@ -12,6 +12,7 @@ import { pgChatExportRepository } from "./pg/repositories/chat-export-repository
 import { pgMcpArtifactRepository } from "./pg/repositories/mcp-artifact-repository.pg";
 import { pgMemoryRepository } from "./pg/repositories/memory-repository.pg";
 import { pgApiKeyRepository } from "./pg/repositories/api-key-repository.pg";
+import { pgModelCatalogRepository } from "./pg/repositories/model-catalog-repository.pg";
 
 export const chatRepository = pgChatRepository;
 export const userRepository = pgUserRepository;
@@ -30,3 +31,4 @@ export const chatExportRepository = pgChatExportRepository;
 export const mcpArtifactRepository = pgMcpArtifactRepository;
 export const memoryRepository = pgMemoryRepository;
 export const apiKeyRepository = pgApiKeyRepository;
+export const modelCatalogRepository = pgModelCatalogRepository;

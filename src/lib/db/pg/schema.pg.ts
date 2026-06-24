@@ -477,3 +477,14 @@ export const MemoryInvocationTable = pgTable(
 export type MemoryEntity = typeof MemoryTable.$inferSelect;
 export type MemoryApiKeyEntity = typeof MemoryApiKeyTable.$inferSelect;
 export type MemoryInvocationEntity = typeof MemoryInvocationTable.$inferSelect;
+
+// Admin-managed model catalog (which OpenRouter models + OpenAI-compatible
+// providers are exposed in the model picker). Single-row settings table.
+export const ModelCatalogConfigTable = pgTable("model_catalog_config", {
+  id: text("id").primaryKey().notNull().default("singleton"),
+  config: jsonb("config").notNull(),
+  updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export type ModelCatalogConfigEntity =
+  typeof ModelCatalogConfigTable.$inferSelect;

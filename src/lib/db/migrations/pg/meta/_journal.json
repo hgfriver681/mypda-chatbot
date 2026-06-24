@@ -141,6 +141,13 @@
       "when": 1782144591254,
       "tag": "0019_gigantic_moondragon",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1782312051649,
+      "tag": "0020_tidy_nick_fury",
+      "breakpoints": true
     }
   ]
 }
