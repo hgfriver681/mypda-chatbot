@@ -1,4 +1,5 @@
 import { UsersTable } from "@/components/admin/users-table";
+import { AdminMcpBulkActions } from "@/components/admin/admin-mcp-bulk-actions";
 import {
   ADMIN_USER_LIST_LIMIT,
   DEFAULT_SORT_BY,
@@ -53,16 +54,21 @@ export default async function UserListPage({ searchParams }: PageProps) {
   });
 
   return (
-    <UsersTable
-      users={result.users}
-      currentUserId={session.user.id}
-      total={result.total}
-      page={page}
-      limit={limit}
-      query={params.query}
-      baseUrl="/admin/users"
-      sortBy={sortBy}
-      sortDirection={sortDirection}
-    />
+    <div className="space-y-4">
+      <div className="flex justify-end px-4 pt-4 md:px-6">
+        <AdminMcpBulkActions />
+      </div>
+      <UsersTable
+        users={result.users}
+        currentUserId={session.user.id}
+        total={result.total}
+        page={page}
+        limit={limit}
+        query={params.query}
+        baseUrl="/admin/users"
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+      />
+    </div>
   );
 }

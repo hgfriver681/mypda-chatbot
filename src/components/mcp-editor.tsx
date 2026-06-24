@@ -36,6 +36,15 @@ interface MCPEditorProps {
   initialConfig?: MCPServerConfig;
   name?: string;
   id?: string;
+  // When provided, the editor saves via this callback instead of POSTing to
+  // /api/mcp (used by the admin "manage a user's MCP" flow). onSaved fires after
+  // a successful save (e.g. to close a dialog / refresh a list).
+  onSubmit?: (payload: {
+    name: string;
+    config: MCPServerConfig;
+    id?: string;
+  }) => Promise<void>;
+  onSaved?: () => void;
 }
 
 const STDIO_ARGS_ENV_PLACEHOLDER = `/** STDIO Example */
@@ -59,6 +68,8 @@ export default function MCPEditor({
   initialConfig,
   name: initialName,
   id,
+  onSubmit,
+  onSaved,
 }: MCPEditorProps) {
   const t = useTranslations();
   const shouldInsert = useMemo(() => isNull(id), [id]);
@@ -148,31 +159,39 @@ export default function MCPEditor({
       );
     }
 
+    const finalConfig = isMaybeRemoteConfig(config)
+      ? { ...config, injectIdentity }
+      : config;
+
     safe(() => setIsLoading(true))
       .map(async () => {
-        if (shouldInsert) {
+        // Global name-uniqueness check only matters for the normal /api/mcp
+        // flow; in the admin per-user flow names may repeat across users.
+        if (shouldInsert && !onSubmit) {
           const exist = await existMcpClientByServerNameAction(name);
           if (exist) {
             throw new Error(t("MCP.nameAlreadyExists"));
           }
         }
       })
-      .map(() =>
-        fetcher("/api/mcp", {
+      .map(async () => {
+        if (onSubmit) {
+          await onSubmit({ name, config: finalConfig, id });
+          return;
+        }
+        return fetcher("/api/mcp", {
           method: "POST",
-          body: JSON.stringify({
-            name,
-            config: isMaybeRemoteConfig(config)
-              ? { ...config, injectIdentity }
-              : config,
-            id,
-          }),
-        }),
-      )
+          body: JSON.stringify({ name, config: finalConfig, id }),
+        });
+      })
       .ifOk(() => {
         toast.success(t("MCP.configurationSavedSuccessfully"));
-        mutate("/api/mcp/list");
-        router.push("/mcp");
+        if (onSubmit) {
+          onSaved?.();
+        } else {
+          mutate("/api/mcp/list");
+          router.push("/mcp");
+        }
       })
       .ifFail(handleErrorWithToast)
       .watch(() => setIsLoading(false));

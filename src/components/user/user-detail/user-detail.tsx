@@ -3,6 +3,7 @@
 import { BasicUserWithLastLogin } from "app-types/user";
 import { UserDetailFormCard } from "./user-detail-form-card";
 import { UserAccessCard } from "./user-access-card";
+import { UserMcpCard } from "./user-mcp-card";
 import { useProfileTranslations } from "@/hooks/use-profile-translations";
 import { useSidebar } from "ui/sidebar";
 import useSWR, { mutate } from "swr";
@@ -84,6 +85,16 @@ export function UserDetail({
           view={view}
           onUserDetailsUpdate={handleUserUpdate}
         />
+
+        {view === "admin" && (
+          <div
+            className={cn("col-span-1 md:col-span-2", {
+              "col-span-1 md:col-span-1 lg:col-span-2": sidebarOpen,
+            })}
+          >
+            <UserMcpCard targetUserId={initialUser.id} />
+          </div>
+        )}
 
         <div
           className={cn("col-span-1 md:col-span-2", {
