@@ -276,8 +276,8 @@ Write a self-contained HTML body (you may include <style> and <script>; CDN libr
 You also have a BUILT-IN, STATELESS AI tool under the reserved server name "ai" (no MCP server needed, always available):
 - \`window.mcp.call("ai", "summarize", { instruction?, data })\` -> a concise summary of \`data\` (string or object)
 - \`window.mcp.call("ai", "complete", { system?, prompt, image? })\` -> a free-form LLM completion; pass \`image\` (http(s) URL, data: URL, or raw base64) to ask about an image (vision)
-- \`window.mcp.call("ai", "ocr", { image, instruction?, mimeType? })\` -> read text from an image (OCR) via a vision model; \`image\` is an http(s) URL, data: URL, or raw base64. Pass an \`instruction\` to extract structured fields instead of raw text.
-Use it to summarize / rewrite / analyze results inside the artifact (e.g. a "Summarize" button that runs the comparison result through \`ai.summarize\`, or an "OCR" button that runs an uploaded image through \`ai.ocr\`). It is stateless — pass everything it needs in the arguments. Read its output with \`window.mcp.text(result)\`. (No need to list "ai" in \`allowedServers\`.)
+Use it to summarize / rewrite / analyze results inside the artifact. It is stateless — pass everything it needs in the arguments. Read its output with \`window.mcp.text(result)\`. (No need to list "ai" in \`allowedServers\`.)
+NOTE: the "ai" tool has NO "ocr". For OCR, use the \`ocr\` tool on the files MCP server (e.g. \`window.mcp.call("files-mcp", "ocr", { image_base64, instruction? })\`, or \`{ path }\` for a stored image). It returns an object {text, model, chars}; read the text with \`window.mcp.json(result).text\` (NOT window.mcp.text).
 
 MCP servers and tools available to artifacts:
 ${menu}`;
