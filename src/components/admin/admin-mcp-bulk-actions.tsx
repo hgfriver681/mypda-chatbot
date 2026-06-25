@@ -9,30 +9,42 @@ import {
   adminRefreshAllMcpAction,
 } from "@/app/api/admin/mcp-actions";
 
-// The standard MCP every workshop user should get (files MCP + identity inject).
-const STANDARD_MCP = {
-  name: "files-mcp",
-  config: {
-    url: "https://files-mcp.mypda.ai/mcp",
-    injectIdentity: true,
+// The standard private MCPs every workshop user should get — each with identity
+// injection (no shared api-key), so files are isolated per user and memory
+// starts blank per user.
+const STANDARD_MCPS = [
+  {
+    name: "files-mcp",
+    config: { url: "https://files-mcp.mypda.ai/mcp", injectIdentity: true },
   },
-};
+  {
+    name: "memory-mcp",
+    config: { url: "https://memory-mcp.mypda.ai/mcp", injectIdentity: true },
+  },
+];
 
 export function AdminMcpBulkActions() {
   const [busy, setBusy] = useState<null | "provision" | "refresh">(null);
 
   const provision = async () => {
+    const names = STANDARD_MCPS.map((m) => m.name).join(" + ");
     if (
       !confirm(
-        `把標準 MCP「${STANDARD_MCP.name}」(${STANDARD_MCP.config.url},自動帶入身分)發給所有非 admin 使用者?已有同名的會略過。`,
+        `把標準 MCP「${names}」(都自動帶入身分、各自獨立)發給所有非 admin 使用者?已有同名的會略過。`,
       )
     )
       return;
     setBusy("provision");
     try {
-      const r = await adminProvisionMcpForAllAction(STANDARD_MCP);
+      const results = await Promise.all(
+        STANDARD_MCPS.map((m) => adminProvisionMcpForAllAction(m)),
+      );
+      const summary = STANDARD_MCPS.map(
+        (m, i) =>
+          `${m.name}: 新增 ${results[i].provisioned}、略過 ${results[i].skipped}`,
+      ).join(";");
       toast.success(
-        `已發佈:新增 ${r.provisioned} 位、略過 ${r.skipped} 位(共 ${r.total} 位非 admin)`,
+        `已發佈 — ${summary}(共 ${results[0]?.total ?? 0} 位非 admin)`,
       );
     } catch (e: any) {
       toast.error(e?.message ?? "發佈失敗");
@@ -67,7 +79,7 @@ export function AdminMcpBulkActions() {
         ) : (
           <Boxes className="size-4" />
         )}
-        發佈標準 MCP 給所有 user
+        發佈標準 MCP(files + memory)給所有 user
       </Button>
       <Button
         variant="outline"
