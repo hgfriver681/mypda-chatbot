@@ -40,11 +40,6 @@ export const ARTIFACT_AI_SERVER = {
       description:
         "General-purpose LLM completion. args: { system?: string, prompt: string, image?: string }. If `image` is given (http(s) URL, data: URL, or raw base64) the call uses a vision model. Stateless.",
     },
-    {
-      name: "ocr",
-      description:
-        "Read text from an image with a vision model (OCR). args: { image: string (http(s) URL, data: URL, or raw base64), instruction?: string, mimeType?: string }. Returns the extracted text; pass an instruction to get structured fields instead. Stateless.",
-    },
   ],
 };
 
@@ -112,18 +107,6 @@ async function visionGenerate(
 
 export async function runArtifactAi(tool: string, args: any): Promise<string> {
   const a = args ?? {};
-
-  if (tool === "ocr") {
-    const instruction =
-      typeof a.instruction === "string" && a.instruction.trim()
-        ? a.instruction.trim()
-        : "Extract all text from this image. Preserve the reading order and line breaks. Return only the transcribed text.";
-    return visionGenerate(
-      "You are an OCR engine. Transcribe the image faithfully. Do not translate, summarize, or invent content.",
-      instruction,
-      toImage(a.image, a.mimeType),
-    );
-  }
 
   if (tool === "complete" && a.image) {
     // Vision completion: free-form prompt about an image.
