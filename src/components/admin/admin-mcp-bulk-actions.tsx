@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "ui/button";
-import { Boxes, RefreshCw, Loader } from "lucide-react";
+import { Boxes, RefreshCw, Loader, Trash2 } from "lucide-react";
 import {
   adminProvisionMcpForAllAction,
   adminRefreshAllMcpAction,
+  adminUnprovisionMcpForAllAction,
 } from "@/app/api/admin/mcp-actions";
 
 // The standard private MCPs every workshop user should get — each with identity
@@ -24,7 +25,28 @@ const STANDARD_MCPS = [
 ];
 
 export function AdminMcpBulkActions() {
-  const [busy, setBusy] = useState<null | "provision" | "refresh">(null);
+  const [busy, setBusy] = useState<
+    null | "provision" | "refresh" | "unprovision"
+  >(null);
+
+  const unprovision = async () => {
+    const names = STANDARD_MCPS.map((m) => m.name);
+    if (
+      !confirm(
+        `從所有 user 移除標準 MCP「${names.join(" + ")}」?(只移除這些名稱的;你自己的 datapilot-pdf / mypda-memory 不受影響)`,
+      )
+    )
+      return;
+    setBusy("unprovision");
+    try {
+      const r = await adminUnprovisionMcpForAllAction({ names });
+      toast.success(`已回收:移除 ${r.removed} 台(符合 ${r.matched} 台)`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "回收失敗");
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const provision = async () => {
     const names = STANDARD_MCPS.map((m) => m.name).join(" + ");
@@ -93,6 +115,19 @@ export function AdminMcpBulkActions() {
           <RefreshCw className="size-4" />
         )}
         重整所有 user 的 MCP
+      </Button>
+      <Button
+        variant="destructive"
+        size="sm"
+        onClick={unprovision}
+        disabled={busy !== null}
+      >
+        {busy === "unprovision" ? (
+          <Loader className="size-4 animate-spin" />
+        ) : (
+          <Trash2 className="size-4" />
+        )}
+        從所有 user 移除標準 MCP
       </Button>
     </div>
   );

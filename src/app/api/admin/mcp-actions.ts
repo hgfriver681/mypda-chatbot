@@ -133,3 +133,28 @@ export async function adminRefreshAllMcpAction(): Promise<{
   const count = results.filter((r) => r.status === "fulfilled").length;
   return { count, total: all.length };
 }
+
+/**
+ * Inverse of provision: remove every MCP server whose name is in `names` (the
+ * standard provisioned set, e.g. files-mcp / memory-mcp) from ALL users. The
+ * admin's own public servers use different names (datapilot-pdf / mypda-memory)
+ * so they are not touched. Best-effort per server.
+ */
+export async function adminUnprovisionMcpForAllAction(input: {
+  names: string[];
+}): Promise<{ removed: number; matched: number }> {
+  await requireAdminPermission("unprovision MCP servers");
+  const names = new Set((input.names ?? []).filter(Boolean));
+  const all = await mcpRepository.selectAll();
+  const targets = all.filter((s) => names.has(s.name));
+  let removed = 0;
+  for (const s of targets) {
+    try {
+      await mcpClientsManager.removeClient(s.id);
+      removed++;
+    } catch {
+      // ignore individual failures
+    }
+  }
+  return { removed, matched: targets.length };
+}
