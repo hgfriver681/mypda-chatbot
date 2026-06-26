@@ -39,6 +39,13 @@ const options = {
     nextCookies(),
   ],
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL,
+  // Extra origins allowed to call auth (e.g. a custom domain + the .vercel.app
+  // URL). Comma-separated env so domains can be managed without code changes.
+  // The baseURL origin is always trusted; these are added on top.
+  trustedOrigins: (process.env.TRUSTED_ORIGINS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
   user: {
     changeEmail: {
       enabled: true,
