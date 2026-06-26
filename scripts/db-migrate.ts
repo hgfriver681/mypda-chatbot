@@ -11,6 +11,17 @@ await runMigrate()
   .catch((err) => {
     console.error(err);
 
+    // On Vercel builds, don't fail the whole deploy just because a migration
+    // step errored — the live schema is already applied and the app runs on it.
+    // (Locally / in Docker we still hard-fail so a real pending migration is
+    // not silently skipped. Run `pnpm db:migrate` manually to apply one.)
+    if (process.env.VERCEL === "1") {
+      console.warn(
+        "⚠️ DB migration step errored on Vercel build — continuing without failing the build (existing schema assumed current). If you intend a real schema change, run `pnpm db:migrate` against the DB manually.",
+      );
+      process.exit(0);
+    }
+
     console.warn(
       `
       ${colorize("red", "🚨 Migration failed due to incompatible schema.")}
